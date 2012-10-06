@@ -40,3 +40,7 @@
 #ifdef __cplusplus
 #import "Box2D.h"
 #endif // __cplusplus
+
+
+// Game config
+

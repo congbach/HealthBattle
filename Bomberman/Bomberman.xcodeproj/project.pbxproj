@@ -7,6 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BE7AA9E51620C7EC008498B1 /* GameLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = BE7AA9E41620C7EC008498B1 /* GameLayer.m */; };
+		BE7AA9EF1620CA8F008498B1 /* Bomberman.m in Sources */ = {isa = PBXBuildFile; fileRef = BE7AA9EC1620CA8F008498B1 /* Bomberman.m */; };
+		BE7AA9F01620CA8F008498B1 /* GameObject.m in Sources */ = {isa = PBXBuildFile; fileRef = BE7AA9EE1620CA8F008498B1 /* GameObject.m */; };
+		BE7AA9F51620D52D008498B1 /* Bomberman.plist in Resources */ = {isa = PBXBuildFile; fileRef = BE7AA9F31620D52D008498B1 /* Bomberman.plist */; };
+		BE7AA9F61620D52D008498B1 /* Bomberman@2x.plist in Resources */ = {isa = PBXBuildFile; fileRef = BE7AA9F41620D52D008498B1 /* Bomberman@2x.plist */; };
+		BE7AA9F91620D536008498B1 /* Bomberman.png in Resources */ = {isa = PBXBuildFile; fileRef = BE7AA9F71620D536008498B1 /* Bomberman.png */; };
+		BE7AA9FA1620D536008498B1 /* Bomberman@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BE7AA9F81620D536008498B1 /* Bomberman@2x.png */; };
+		BE7AA9FD1620D5EE008498B1 /* GamePreLoadLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = BE7AA9FC1620D5EE008498B1 /* GamePreLoadLayer.m */; };
+		BE7AAA3B1620E716008498B1 /* SneakyInputLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = BE7AAA3A1620E716008498B1 /* SneakyInputLayer.m */; };
 		DC193EB713B692D100500B56 /* GLES-Render.mm in Sources */ = {isa = PBXBuildFile; fileRef = DC193EB313B6872600500B56 /* GLES-Render.mm */; };
 		DC193EB813B692D100500B56 /* GLES-Render.mm in Sources */ = {isa = PBXBuildFile; fileRef = DC193EB313B6872600500B56 /* GLES-Render.mm */; };
 		DC193EBC13B6956F00500B56 /* ContactListener.mm in Sources */ = {isa = PBXBuildFile; fileRef = DC193EBB13B6956F00500B56 /* ContactListener.mm */; };
@@ -62,6 +71,21 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		BE7AA9E31620C7EC008498B1 /* GameLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameLayer.h; sourceTree = "<group>"; };
+		BE7AA9E41620C7EC008498B1 /* GameLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GameLayer.m; sourceTree = "<group>"; };
+		BE7AA9E91620C9BD008498B1 /* GameCommon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GameCommon.h; sourceTree = "<group>"; };
+		BE7AA9EB1620CA8F008498B1 /* Bomberman.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Bomberman.h; sourceTree = "<group>"; };
+		BE7AA9EC1620CA8F008498B1 /* Bomberman.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Bomberman.m; sourceTree = "<group>"; };
+		BE7AA9ED1620CA8F008498B1 /* GameObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameObject.h; sourceTree = "<group>"; };
+		BE7AA9EE1620CA8F008498B1 /* GameObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GameObject.m; sourceTree = "<group>"; };
+		BE7AA9F31620D52D008498B1 /* Bomberman.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Bomberman.plist; sourceTree = "<group>"; };
+		BE7AA9F41620D52D008498B1 /* Bomberman@2x.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Bomberman@2x.plist"; sourceTree = "<group>"; };
+		BE7AA9F71620D536008498B1 /* Bomberman.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Bomberman.png; sourceTree = "<group>"; };
+		BE7AA9F81620D536008498B1 /* Bomberman@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Bomberman@2x.png"; sourceTree = "<group>"; };
+		BE7AA9FB1620D5EE008498B1 /* GamePreLoadLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GamePreLoadLayer.h; sourceTree = "<group>"; };
+		BE7AA9FC1620D5EE008498B1 /* GamePreLoadLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GamePreLoadLayer.m; sourceTree = "<group>"; };
+		BE7AAA391620E716008498B1 /* SneakyInputLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SneakyInputLayer.h; sourceTree = "<group>"; };
+		BE7AAA3A1620E716008498B1 /* SneakyInputLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SneakyInputLayer.m; sourceTree = "<group>"; };
 		DC193EB213B6872600500B56 /* GLES-Render.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GLES-Render.h"; sourceTree = "<group>"; };
 		DC193EB313B6872600500B56 /* GLES-Render.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "GLES-Render.mm"; sourceTree = "<group>"; };
 		DC193EBA13B6956F00500B56 /* ContactListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContactListener.h; sourceTree = "<group>"; };
@@ -158,6 +182,85 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		BE7AA9D41620BE69008498B1 /* GameScenes */ = {
+			isa = PBXGroup;
+			children = (
+				BE7AA9E31620C7EC008498B1 /* GameLayer.h */,
+				BE7AA9E41620C7EC008498B1 /* GameLayer.m */,
+				BE7AA9FB1620D5EE008498B1 /* GamePreLoadLayer.h */,
+				BE7AA9FC1620D5EE008498B1 /* GamePreLoadLayer.m */,
+				BE7AAA391620E716008498B1 /* SneakyInputLayer.h */,
+				BE7AAA3A1620E716008498B1 /* SneakyInputLayer.m */,
+			);
+			path = GameScenes;
+			sourceTree = "<group>";
+		};
+		BE7AA9D61620C0E1008498B1 /* GameObjects */ = {
+			isa = PBXGroup;
+			children = (
+				BE7AA9EB1620CA8F008498B1 /* Bomberman.h */,
+				BE7AA9EC1620CA8F008498B1 /* Bomberman.m */,
+				BE7AA9ED1620CA8F008498B1 /* GameObject.h */,
+				BE7AA9EE1620CA8F008498B1 /* GameObject.m */,
+			);
+			path = GameObjects;
+			sourceTree = "<group>";
+		};
+		BE7AA9D71620C0FB008498B1 /* GamePhysics */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = GamePhysics;
+			sourceTree = "<group>";
+		};
+		BE7AA9DC1620C770008498B1 /* Arts */ = {
+			isa = PBXGroup;
+			children = (
+				BE7AA9F21620D518008498B1 /* Plists */,
+				BE7AA9F11620D4C8008498B1 /* Sprites */,
+			);
+			path = Arts;
+			sourceTree = "<group>";
+		};
+		BE7AA9EA1620CA53008498B1 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				BE7AA9D71620C0FB008498B1 /* GamePhysics */,
+				BE7AA9D61620C0E1008498B1 /* GameObjects */,
+				BE7AA9D41620BE69008498B1 /* GameScenes */,
+				DC2A3EC2149A30B400EF78B0 /* Box2DDebugLayer.h */,
+				DC2A3EC3149A30B400EF78B0 /* Box2DDebugLayer.mm */,
+				DCC1A38F13A94F1A005BD75D /* PhysicsLayer.h */,
+				DCC1A39013A94F1A005BD75D /* PhysicsLayer.mm */,
+				DC193EBA13B6956F00500B56 /* ContactListener.h */,
+				DC193EBB13B6956F00500B56 /* ContactListener.mm */,
+				DC193EB213B6872600500B56 /* GLES-Render.h */,
+				DC193EB313B6872600500B56 /* GLES-Render.mm */,
+				DCC1A38D13A94F1A005BD75D /* AppDelegate.h */,
+				DCC1A38E13A94F1A005BD75D /* AppDelegate.m */,
+				BE7AA9E91620C9BD008498B1 /* GameCommon.h */,
+			);
+			name = Source;
+			sourceTree = "<group>";
+		};
+		BE7AA9F11620D4C8008498B1 /* Sprites */ = {
+			isa = PBXGroup;
+			children = (
+				BE7AA9F71620D536008498B1 /* Bomberman.png */,
+				BE7AA9F81620D536008498B1 /* Bomberman@2x.png */,
+			);
+			path = Sprites;
+			sourceTree = "<group>";
+		};
+		BE7AA9F21620D518008498B1 /* Plists */ = {
+			isa = PBXGroup;
+			children = (
+				BE7AA9F31620D52D008498B1 /* Bomberman.plist */,
+				BE7AA9F41620D52D008498B1 /* Bomberman@2x.plist */,
+			);
+			path = Plists;
+			sourceTree = "<group>";
+		};
 		DC193EBE13B6969B00500B56 /* David Gervais Tilesets */ = {
 			isa = PBXGroup;
 			children = (
@@ -254,16 +357,7 @@
 		DCC1A38C13A94F1A005BD75D /* Projectfiles */ = {
 			isa = PBXGroup;
 			children = (
-				DC2A3EC2149A30B400EF78B0 /* Box2DDebugLayer.h */,
-				DC2A3EC3149A30B400EF78B0 /* Box2DDebugLayer.mm */,
-				DCC1A38F13A94F1A005BD75D /* PhysicsLayer.h */,
-				DCC1A39013A94F1A005BD75D /* PhysicsLayer.mm */,
-				DC193EBA13B6956F00500B56 /* ContactListener.h */,
-				DC193EBB13B6956F00500B56 /* ContactListener.mm */,
-				DC193EB213B6872600500B56 /* GLES-Render.h */,
-				DC193EB313B6872600500B56 /* GLES-Render.mm */,
-				DCC1A38D13A94F1A005BD75D /* AppDelegate.h */,
-				DCC1A38E13A94F1A005BD75D /* AppDelegate.m */,
+				BE7AA9EA1620CA53008498B1 /* Source */,
 				DCC1A39413A94F1A005BD75D /* Resources */,
 				DCC1A3CF13A94F2C005BD75D /* Supporting Files */,
 			);
@@ -273,6 +367,7 @@
 		DCC1A39413A94F1A005BD75D /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				BE7AA9DC1620C770008498B1 /* Arts */,
 				DC193EBE13B6969B00500B56 /* David Gervais Tilesets */,
 				DCC1A39513A94F1A005BD75D /* config.lua */,
 			);
@@ -386,6 +481,10 @@
 				DC26D6BE14B9E4D500B6002E /* fps_images-hd.png in Resources */,
 				DC65617D15114BC500E59F8A /* fps_images-ipadhd.png in Resources */,
 				DC2721B1160CB01100D88944 /* Default-568h@2x.png in Resources */,
+				BE7AA9F51620D52D008498B1 /* Bomberman.plist in Resources */,
+				BE7AA9F61620D52D008498B1 /* Bomberman@2x.plist in Resources */,
+				BE7AA9F91620D536008498B1 /* Bomberman.png in Resources */,
+				BE7AA9FA1620D536008498B1 /* Bomberman@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -417,6 +516,11 @@
 				DC193EB813B692D100500B56 /* GLES-Render.mm in Sources */,
 				DC193EBC13B6956F00500B56 /* ContactListener.mm in Sources */,
 				DC2A3EC4149A30B400EF78B0 /* Box2DDebugLayer.mm in Sources */,
+				BE7AA9E51620C7EC008498B1 /* GameLayer.m in Sources */,
+				BE7AA9EF1620CA8F008498B1 /* Bomberman.m in Sources */,
+				BE7AA9F01620CA8F008498B1 /* GameObject.m in Sources */,
+				BE7AA9FD1620D5EE008498B1 /* GamePreLoadLayer.m in Sources */,
+				BE7AAA3B1620E716008498B1 /* SneakyInputLayer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
