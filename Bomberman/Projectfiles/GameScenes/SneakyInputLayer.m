@@ -11,11 +11,17 @@
 #import "SneakyJoystickSkinnedBase.h"
 #import "ColoredCircleSprite.h"
 
+static NSString * const JoystickImage = @"Joystick.png";
+
 @interface SneakyInputLayer ()
+
+@property (nonatomic, strong) SneakyJoystick *joystick;
 
 @end
 
 @implementation SneakyInputLayer
+
+@synthesize joystick = _joystick;
 
 -(id) init
 {
@@ -24,10 +30,12 @@
 	{
         SneakyJoystickSkinnedBase *leftJoy = [[SneakyJoystickSkinnedBase alloc] init];
 		leftJoy.position = ccp(64,64);
-		leftJoy.backgroundSprite = [ColoredCircleSprite circleWithColor:ccc4(255, 0, 0, 128) radius:64];
-		leftJoy.thumbSprite = [ColoredCircleSprite circleWithColor:ccc4(0, 0, 255, 200) radius:32];
-		leftJoy.joystick = [[SneakyJoystick alloc] initWithRect:CGRectMake(0,0,128,128)];
+		leftJoy.backgroundSprite = [CCSprite spriteWithFile:JoystickImage];
+        leftJoy.backgroundSprite.opacity = 128;
+		leftJoy.joystick = [[SneakyJoystick alloc] initWithRect:CGRectMake(0, 0, leftJoy.backgroundSprite.size.width, leftJoy.backgroundSprite.size.height)];
+        leftJoy.joystick.isDPad = YES;
 		[self addChild:leftJoy];
+        self.joystick = leftJoy.joystick;
 	}
 	return self;
 }
@@ -47,9 +55,17 @@
 	NSLog(@"dealloc: %@", self);
 }
 
--(void) update:(ccTime)delta
+- (Direction)joystickDirection
 {
-    
+    if (! roundf(self.joystick.velocity.x))
+        return self.joystick.velocity.y == 1 ? kDirectionUp : self.joystick.velocity.y == -1 ? kDirectionDown : kNoDirection;
+    else
+        return self.joystick.velocity.x == 1 ? kDirectionRight : kDirectionLeft;
+}
+
+- (CGPoint)joystickVelocity
+{
+    return self.joystick.velocity;
 }
 
 @end

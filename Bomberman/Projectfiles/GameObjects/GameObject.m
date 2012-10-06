@@ -81,26 +81,38 @@ static const NSInteger GameObjectMovingAnimTag = 9999;
             
         case kDirectionDown:
             return 1;
+            
+        case kNoDirection:
+            return -1;
     }
 }
 
-- (void)setFacingDirection:(Direction)facingDirection
+- (void)setFacingDirection:(Direction)facingDirection forceReset:(BOOL)forceReset
 {
-    if (self.facingDirection != facingDirection)
+    if (forceReset || self.facingDirection != facingDirection)
     {
         _facingDirection = facingDirection;
         self.displayFrame = [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:[NSString stringWithFormat:[self animFormatWithDirection:facingDirection], [self animFirstIndexWithDirection:facingDirection]]];
     }
 }
 
-- (void)playMovingAnimWithDirection:(Direction)direction
-{   
-    [self playAnimLoopedWithFormat:[self animFormatWithDirection:direction] numFrames:GameObjectMovingAnimFramesCount firstIndex:[self animFirstIndexWithDirection:direction] delay:GameObjectMovingAnimDelay animateTag:GameObjectMovingAnimTag restoreOriginalFrame:YES];
+- (void)setFacingDirection:(Direction)facingDirection
+{
+    [self setFacingDirection:facingDirection forceReset:NO];
 }
 
-- (void)stopMovingAnimation
+- (void)playMovingAnimWithDirection:(Direction)direction
+{
+    if (self.facingDirection != direction)
+        [self setFacingDirection:direction];
+    if (! [self getActionByTag:GameObjectMovingAnimTag])
+        [self playAnimLoopedWithFormat:[self animFormatWithDirection:direction] numFrames:GameObjectMovingAnimFramesCount firstIndex:[self animFirstIndexWithDirection:direction] delay:GameObjectMovingAnimDelay animateTag:GameObjectMovingAnimTag restoreOriginalFrame:YES];
+}
+
+- (void)stopMovingAnim
 {
     [self stopActionByTag:GameObjectMovingAnimTag];
+    [self setFacingDirection:self.facingDirection forceReset:YES];
 }
 
 @end

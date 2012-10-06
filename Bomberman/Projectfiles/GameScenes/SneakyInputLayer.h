@@ -7,7 +7,11 @@
 //
 
 #import "kobold2d.h"
+#import "GameCommon.h"
 
 @interface SneakyInputLayer : CCLayer
+
+@property (nonatomic, readonly) Direction joystickDirection;
+@property (nonatomic, readonly) CGPoint joystickVelocity;
 
 @end

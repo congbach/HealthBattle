@@ -16,6 +16,8 @@
 		BE7AA9FA1620D536008498B1 /* Bomberman@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BE7AA9F81620D536008498B1 /* Bomberman@2x.png */; };
 		BE7AA9FD1620D5EE008498B1 /* GamePreLoadLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = BE7AA9FC1620D5EE008498B1 /* GamePreLoadLayer.m */; };
 		BE7AAA3B1620E716008498B1 /* SneakyInputLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = BE7AAA3A1620E716008498B1 /* SneakyInputLayer.m */; };
+		BE7AAA461620EDE5008498B1 /* Joystick.png in Resources */ = {isa = PBXBuildFile; fileRef = BE7AAA451620EDE5008498B1 /* Joystick.png */; };
+		BE7AAA481620EE2E008498B1 /* Joystick@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BE7AAA471620EE2E008498B1 /* Joystick@2x.png */; };
 		DC193EB713B692D100500B56 /* GLES-Render.mm in Sources */ = {isa = PBXBuildFile; fileRef = DC193EB313B6872600500B56 /* GLES-Render.mm */; };
 		DC193EB813B692D100500B56 /* GLES-Render.mm in Sources */ = {isa = PBXBuildFile; fileRef = DC193EB313B6872600500B56 /* GLES-Render.mm */; };
 		DC193EBC13B6956F00500B56 /* ContactListener.mm in Sources */ = {isa = PBXBuildFile; fileRef = DC193EBB13B6956F00500B56 /* ContactListener.mm */; };
@@ -86,6 +88,8 @@
 		BE7AA9FC1620D5EE008498B1 /* GamePreLoadLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GamePreLoadLayer.m; sourceTree = "<group>"; };
 		BE7AAA391620E716008498B1 /* SneakyInputLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SneakyInputLayer.h; sourceTree = "<group>"; };
 		BE7AAA3A1620E716008498B1 /* SneakyInputLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SneakyInputLayer.m; sourceTree = "<group>"; };
+		BE7AAA451620EDE5008498B1 /* Joystick.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Joystick.png; sourceTree = "<group>"; };
+		BE7AAA471620EE2E008498B1 /* Joystick@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Joystick@2x.png"; sourceTree = "<group>"; };
 		DC193EB213B6872600500B56 /* GLES-Render.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GLES-Render.h"; sourceTree = "<group>"; };
 		DC193EB313B6872600500B56 /* GLES-Render.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "GLES-Render.mm"; sourceTree = "<group>"; };
 		DC193EBA13B6956F00500B56 /* ContactListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContactListener.h; sourceTree = "<group>"; };
@@ -248,6 +252,8 @@
 			children = (
 				BE7AA9F71620D536008498B1 /* Bomberman.png */,
 				BE7AA9F81620D536008498B1 /* Bomberman@2x.png */,
+				BE7AAA451620EDE5008498B1 /* Joystick.png */,
+				BE7AAA471620EE2E008498B1 /* Joystick@2x.png */,
 			);
 			path = Sprites;
 			sourceTree = "<group>";
@@ -485,6 +491,8 @@
 				BE7AA9F61620D52D008498B1 /* Bomberman@2x.plist in Resources */,
 				BE7AA9F91620D536008498B1 /* Bomberman.png in Resources */,
 				BE7AA9FA1620D536008498B1 /* Bomberman@2x.png in Resources */,
+				BE7AAA461620EDE5008498B1 /* Joystick.png in Resources */,
+				BE7AAA481620EE2E008498B1 /* Joystick@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

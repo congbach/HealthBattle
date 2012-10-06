@@ -13,6 +13,7 @@
 static const CGSize GridSize = { 32, 32 };
 static const int BatchNodeZOrder = 0;
 static const int OverlayZOrder = 1;
+static const CGFloat JoystickVelocityMultiplier = 1;
 
 @interface GameLayer ()
 
@@ -46,7 +47,7 @@ static const int OverlayZOrder = 1;
         self.bomberman = [[Bomberman alloc] init];
         [self.bombermanBatchNode addChild:self.bomberman];
         
-        [self.bomberman setPosition:CGPointMake(100, 100)];
+        [self.bomberman setPosition:CGPointMake(240, 160)];
         
         [self scheduleUpdate];
 	}
@@ -70,7 +71,18 @@ static const int OverlayZOrder = 1;
 
 -(void) update:(ccTime)delta
 {
+    // Move bomerman
+    Direction joystickDirection = self.sneakyInputLayer.joystickDirection;
+    if (joystickDirection != kNoDirection)
+        [self.bomberman playMovingAnimWithDirection:joystickDirection];
+    else
+        [self.bomberman stopMovingAnim];
     
+    CGPoint joystickVelocity = self.sneakyInputLayer.joystickVelocity;
+    CGPoint bombermanPosition = self.bomberman.position;
+    bombermanPosition.x += JoystickVelocityMultiplier * joystickVelocity.x;
+    bombermanPosition.y += JoystickVelocityMultiplier * joystickVelocity.y;
+    self.bomberman.position = bombermanPosition;
 }
 
 - (void)loadBatchNodes

@@ -6,4 +6,4 @@
 //
 //
 
-typedef enum { kDirectionLeft, kDirectionRight, kDirectionUp, kDirectionDown } Direction;
+typedef enum { kNoDirection, kDirectionLeft, kDirectionRight, kDirectionUp, kDirectionDown } Direction;

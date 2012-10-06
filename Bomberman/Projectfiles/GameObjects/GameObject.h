@@ -22,6 +22,6 @@ static const int GameObjectSpriteBatchNodeCol = 4;
 
 - (id)initWithAnimPrefix:(NSString *)prefix;
 - (void)playMovingAnimWithDirection:(Direction)direction;
-- (void)stopMovingAnimation;
+- (void)stopMovingAnim;
 
 @end
