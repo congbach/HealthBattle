@@ -93,8 +93,13 @@ static NSString * const DemoMap = @"Demo.tmx";
     self.bomberman = [[Bomberman alloc] init];
     [self.bombermanBatchNode addChild:self.bomberman];
     
-    [self.bomberman setPosition:CGPointMake(240, 160)];
+    CGSize mapSize = self.tileMap.mapSize;
+    CGSize tileSize = self.tileMap.tileSize;
     
+    CGPoint startingCoordinate = CGPointMake(1, mapSize.height - 2);
+    
+    [self.bomberman setPosition:CGPointMake((startingCoordinate.x + 0.5f) * tileSize.width,
+                                            (startingCoordinate.y + 0.5f) * tileSize.height)];
 }
 
 - (void)createSneakyInputLayer
