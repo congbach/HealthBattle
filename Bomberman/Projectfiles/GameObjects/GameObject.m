@@ -35,7 +35,6 @@ static const NSInteger GameObjectMovingAnimTag = 9999;
     {
         self.animPrefix = prefix;
         self.facingDirection = kDirectionRight;
-        self.scale = 3.0f;
     }
     return self;
 }

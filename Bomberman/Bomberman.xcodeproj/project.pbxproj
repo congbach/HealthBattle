@@ -18,6 +18,9 @@
 		BE7AAA3B1620E716008498B1 /* SneakyInputLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = BE7AAA3A1620E716008498B1 /* SneakyInputLayer.m */; };
 		BE7AAA461620EDE5008498B1 /* Joystick.png in Resources */ = {isa = PBXBuildFile; fileRef = BE7AAA451620EDE5008498B1 /* Joystick.png */; };
 		BE7AAA481620EE2E008498B1 /* Joystick@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BE7AAA471620EE2E008498B1 /* Joystick@2x.png */; };
+		BE7AAA57162101D6008498B1 /* Tileset.png in Resources */ = {isa = PBXBuildFile; fileRef = BE7AAA55162101D6008498B1 /* Tileset.png */; };
+		BE7AAA58162101D6008498B1 /* Tileset@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BE7AAA56162101D6008498B1 /* Tileset@2x.png */; };
+		BE7AAA5D1621059C008498B1 /* Demo.tmx in Resources */ = {isa = PBXBuildFile; fileRef = BE7AAA5C1621059C008498B1 /* Demo.tmx */; };
 		DC193EB713B692D100500B56 /* GLES-Render.mm in Sources */ = {isa = PBXBuildFile; fileRef = DC193EB313B6872600500B56 /* GLES-Render.mm */; };
 		DC193EB813B692D100500B56 /* GLES-Render.mm in Sources */ = {isa = PBXBuildFile; fileRef = DC193EB313B6872600500B56 /* GLES-Render.mm */; };
 		DC193EBC13B6956F00500B56 /* ContactListener.mm in Sources */ = {isa = PBXBuildFile; fileRef = DC193EBB13B6956F00500B56 /* ContactListener.mm */; };
@@ -90,6 +93,9 @@
 		BE7AAA3A1620E716008498B1 /* SneakyInputLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SneakyInputLayer.m; sourceTree = "<group>"; };
 		BE7AAA451620EDE5008498B1 /* Joystick.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Joystick.png; sourceTree = "<group>"; };
 		BE7AAA471620EE2E008498B1 /* Joystick@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Joystick@2x.png"; sourceTree = "<group>"; };
+		BE7AAA55162101D6008498B1 /* Tileset.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Tileset.png; sourceTree = "<group>"; };
+		BE7AAA56162101D6008498B1 /* Tileset@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Tileset@2x.png"; sourceTree = "<group>"; };
+		BE7AAA5C1621059C008498B1 /* Demo.tmx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = Demo.tmx; path = Projectfiles/Resources/Arts/Sprites/Demo.tmx; sourceTree = SOURCE_ROOT; };
 		DC193EB213B6872600500B56 /* GLES-Render.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GLES-Render.h"; sourceTree = "<group>"; };
 		DC193EB313B6872600500B56 /* GLES-Render.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "GLES-Render.mm"; sourceTree = "<group>"; };
 		DC193EBA13B6956F00500B56 /* ContactListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContactListener.h; sourceTree = "<group>"; };
@@ -254,6 +260,8 @@
 				BE7AA9F81620D536008498B1 /* Bomberman@2x.png */,
 				BE7AAA451620EDE5008498B1 /* Joystick.png */,
 				BE7AAA471620EE2E008498B1 /* Joystick@2x.png */,
+				BE7AAA55162101D6008498B1 /* Tileset.png */,
+				BE7AAA56162101D6008498B1 /* Tileset@2x.png */,
 			);
 			path = Sprites;
 			sourceTree = "<group>";
@@ -265,6 +273,15 @@
 				BE7AA9F41620D52D008498B1 /* Bomberman@2x.plist */,
 			);
 			path = Plists;
+			sourceTree = "<group>";
+		};
+		BE7AAA5916210351008498B1 /* Maps */ = {
+			isa = PBXGroup;
+			children = (
+				BE7AAA5C1621059C008498B1 /* Demo.tmx */,
+			);
+			name = Maps;
+			path = Tmxs;
 			sourceTree = "<group>";
 		};
 		DC193EBE13B6969B00500B56 /* David Gervais Tilesets */ = {
@@ -373,6 +390,7 @@
 		DCC1A39413A94F1A005BD75D /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				BE7AAA5916210351008498B1 /* Maps */,
 				BE7AA9DC1620C770008498B1 /* Arts */,
 				DC193EBE13B6969B00500B56 /* David Gervais Tilesets */,
 				DCC1A39513A94F1A005BD75D /* config.lua */,
@@ -493,6 +511,9 @@
 				BE7AA9FA1620D536008498B1 /* Bomberman@2x.png in Resources */,
 				BE7AAA461620EDE5008498B1 /* Joystick.png in Resources */,
 				BE7AAA481620EE2E008498B1 /* Joystick@2x.png in Resources */,
+				BE7AAA57162101D6008498B1 /* Tileset.png in Resources */,
+				BE7AAA58162101D6008498B1 /* Tileset@2x.png in Resources */,
+				BE7AAA5D1621059C008498B1 /* Demo.tmx in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

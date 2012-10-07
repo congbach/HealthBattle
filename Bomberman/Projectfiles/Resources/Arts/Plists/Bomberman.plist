@@ -7,210 +7,210 @@
             <key>Bomberman_01</key>
             <dict>
                 <key>frame</key>
-                <string>{{22,56},{16,25}}</string>
+                <string>{{54,70},{24,32}}</string>
                 <key>offset</key>
-                <string>{-1,0}</string>
+                <string>{0,0}</string>
                 <key>rotated</key>
                 <false/>
                 <key>sourceColorRect</key>
-                <string>{{1,0},{16,25}}</string>
+                <string>{{1,0},{24,32}}</string>
                 <key>sourceSize</key>
-                <string>{20,25}</string>
+                <string>{26,32}</string>
             </dict>
             <key>Bomberman_02</key>
             <dict>
                 <key>frame</key>
-                <string>{{22,29},{16,25}}</string>
+                <string>{{30,2},{24,32}}</string>
                 <key>offset</key>
-                <string>{0,0}</string>
+                <string>{-1,0}</string>
                 <key>rotated</key>
                 <false/>
                 <key>sourceColorRect</key>
-                <string>{{2,0},{16,25}}</string>
+                <string>{{0,0},{24,32}}</string>
                 <key>sourceSize</key>
-                <string>{20,25}</string>
+                <string>{26,32}</string>
             </dict>
             <key>Bomberman_03</key>
             <dict>
                 <key>frame</key>
-                <string>{{110,2},{16,25}}</string>
+                <string>{{2,36},{26,32}}</string>
                 <key>offset</key>
-                <string>{-1,0}</string>
+                <string>{0,0}</string>
                 <key>rotated</key>
                 <false/>
                 <key>sourceColorRect</key>
-                <string>{{1,0},{16,25}}</string>
+                <string>{{0,0},{26,32}}</string>
                 <key>sourceSize</key>
-                <string>{20,25}</string>
+                <string>{26,32}</string>
             </dict>
             <key>Bomberman_04</key>
             <dict>
                 <key>frame</key>
-                <string>{{83,2},{16,25}}</string>
+                <string>{{30,36},{24,32}}</string>
                 <key>offset</key>
-                <string>{-1,0}</string>
+                <string>{0,0}</string>
                 <key>rotated</key>
-                <true/>
+                <false/>
                 <key>sourceColorRect</key>
-                <string>{{1,0},{16,25}}</string>
+                <string>{{1,0},{24,32}}</string>
                 <key>sourceSize</key>
-                <string>{20,25}</string>
+                <string>{26,32}</string>
             </dict>
             <key>Bomberman_05</key>
             <dict>
                 <key>frame</key>
-                <string>{{2,83},{18,25}}</string>
+                <string>{{100,36},{20,32}}</string>
                 <key>offset</key>
-                <string>{0,0}</string>
+                <string>{-1,0}</string>
                 <key>rotated</key>
                 <false/>
                 <key>sourceColorRect</key>
-                <string>{{1,0},{18,25}}</string>
+                <string>{{2,0},{20,32}}</string>
                 <key>sourceSize</key>
-                <string>{20,25}</string>
+                <string>{26,32}</string>
             </dict>
             <key>Bomberman_06</key>
             <dict>
                 <key>frame</key>
-                <string>{{63,20},{20,23}}</string>
+                <string>{{80,70},{20,32}}</string>
                 <key>offset</key>
-                <string>{0,-1}</string>
+                <string>{-1,0}</string>
                 <key>rotated</key>
-                <true/>
+                <false/>
                 <key>sourceColorRect</key>
-                <string>{{0,2},{20,23}}</string>
+                <string>{{2,0},{20,32}}</string>
                 <key>sourceSize</key>
-                <string>{20,25}</string>
+                <string>{26,32}</string>
             </dict>
             <key>Bomberman_07</key>
             <dict>
                 <key>frame</key>
-                <string>{{2,56},{18,25}}</string>
+                <string>{{70,104},{20,32}}</string>
                 <key>offset</key>
-                <string>{0,0}</string>
+                <string>{-1,0}</string>
                 <key>rotated</key>
-                <false/>
+                <true/>
                 <key>sourceColorRect</key>
-                <string>{{1,0},{18,25}}</string>
+                <string>{{2,0},{20,32}}</string>
                 <key>sourceSize</key>
-                <string>{20,25}</string>
+                <string>{26,32}</string>
             </dict>
             <key>Bomberman_08</key>
             <dict>
                 <key>frame</key>
-                <string>{{88,20},{18,23}}</string>
+                <string>{{78,36},{20,32}}</string>
                 <key>offset</key>
-                <string>{0,-1}</string>
+                <string>{-1,0}</string>
                 <key>rotated</key>
                 <false/>
                 <key>sourceColorRect</key>
-                <string>{{1,2},{18,23}}</string>
+                <string>{{2,0},{20,32}}</string>
                 <key>sourceSize</key>
-                <string>{20,25}</string>
+                <string>{26,32}</string>
             </dict>
             <key>Bomberman_09</key>
             <dict>
                 <key>frame</key>
-                <string>{{2,29},{18,25}}</string>
+                <string>{{56,36},{20,32}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
                 <false/>
                 <key>sourceColorRect</key>
-                <string>{{1,0},{18,25}}</string>
+                <string>{{3,0},{20,32}}</string>
                 <key>sourceSize</key>
-                <string>{20,25}</string>
+                <string>{26,32}</string>
             </dict>
             <key>Bomberman_10</key>
             <dict>
                 <key>frame</key>
-                <string>{{38,108},{18,23}}</string>
+                <string>{{104,2},{20,32}}</string>
                 <key>offset</key>
-                <string>{0,-1}</string>
+                <string>{0,0}</string>
                 <key>rotated</key>
-                <true/>
+                <false/>
                 <key>sourceColorRect</key>
-                <string>{{1,2},{18,23}}</string>
+                <string>{{3,0},{20,32}}</string>
                 <key>sourceSize</key>
-                <string>{20,25}</string>
+                <string>{26,32}</string>
             </dict>
             <key>Bomberman_11</key>
             <dict>
                 <key>frame</key>
-                <string>{{2,2},{18,25}}</string>
+                <string>{{36,104},{20,32}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
-                <false/>
+                <true/>
                 <key>sourceColorRect</key>
-                <string>{{1,0},{18,25}}</string>
+                <string>{{3,0},{20,32}}</string>
                 <key>sourceSize</key>
-                <string>{20,25}</string>
+                <string>{26,32}</string>
             </dict>
             <key>Bomberman_12</key>
             <dict>
                 <key>frame</key>
-                <string>{{38,83},{20,23}}</string>
-                <key>offset</key>
-                <string>{0,-1}</string>
-                <key>rotated</key>
-                <false/>
-                <key>sourceColorRect</key>
-                <string>{{0,2},{20,23}}</string>
-                <key>sourceSize</key>
-                <string>{20,25}</string>
-            </dict>
-            <key>Bomberman_13</key>
-            <dict>
-                <key>frame</key>
-                <string>{{56,2},{16,25}}</string>
-                <key>offset</key>
-                <string>{-1,0}</string>
-                <key>rotated</key>
-                <true/>
-                <key>sourceColorRect</key>
-                <string>{{1,0},{16,25}}</string>
-                <key>sourceSize</key>
-                <string>{20,25}</string>
-            </dict>
-            <key>Bomberman_14</key>
-            <dict>
-                <key>frame</key>
-                <string>{{22,83},{14,25}}</string>
-                <key>offset</key>
-                <string>{-1,0}</string>
-                <key>rotated</key>
-                <false/>
-                <key>sourceColorRect</key>
-                <string>{{2,0},{14,25}}</string>
-                <key>sourceSize</key>
-                <string>{20,25}</string>
-            </dict>
-            <key>Bomberman_15</key>
-            <dict>
-                <key>frame</key>
-                <string>{{29,2},{16,25}}</string>
-                <key>offset</key>
-                <string>{-1,0}</string>
-                <key>rotated</key>
-                <true/>
-                <key>sourceColorRect</key>
-                <string>{{1,0},{16,25}}</string>
-                <key>sourceSize</key>
-                <string>{20,25}</string>
-            </dict>
-            <key>Bomberman_16</key>
-            <dict>
-                <key>frame</key>
-                <string>{{2,110},{16,25}}</string>
+                <string>{{2,104},{20,32}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
                 <true/>
                 <key>sourceColorRect</key>
-                <string>{{2,0},{16,25}}</string>
+                <string>{{3,0},{20,32}}</string>
                 <key>sourceSize</key>
-                <string>{20,25}</string>
+                <string>{26,32}</string>
+            </dict>
+            <key>Bomberman_13</key>
+            <dict>
+                <key>frame</key>
+                <string>{{70,2},{24,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{1,0},{24,32}}</string>
+                <key>sourceSize</key>
+                <string>{26,32}</string>
+            </dict>
+            <key>Bomberman_14</key>
+            <dict>
+                <key>frame</key>
+                <string>{{28,70},{24,32}}</string>
+                <key>offset</key>
+                <string>{-1,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{24,32}}</string>
+                <key>sourceSize</key>
+                <string>{26,32}</string>
+            </dict>
+            <key>Bomberman_15</key>
+            <dict>
+                <key>frame</key>
+                <string>{{2,2},{26,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{26,32}}</string>
+                <key>sourceSize</key>
+                <string>{26,32}</string>
+            </dict>
+            <key>Bomberman_16</key>
+            <dict>
+                <key>frame</key>
+                <string>{{2,70},{24,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{1,0},{24,32}}</string>
+                <key>sourceSize</key>
+                <string>{26,32}</string>
             </dict>
         </dict>
         <key>metadata</key>
@@ -220,9 +220,9 @@
             <key>realTextureFileName</key>
             <string>Bomberman.png</string>
             <key>size</key>
-            <string>{128,128}</string>
+            <string>{126,126}</string>
             <key>smartupdate</key>
-            <string>$TexturePacker:SmartUpdate:da7edd397c92b9e7c6184451dc6dac1e$</string>
+            <string>$TexturePacker:SmartUpdate:3891ccb11a8741e03e0c603fb818fd07$</string>
             <key>textureFileName</key>
             <string>Bomberman.png</string>
         </dict>

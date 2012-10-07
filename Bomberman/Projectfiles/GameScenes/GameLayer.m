@@ -11,27 +11,35 @@
 #import "Bomberman.h"
 
 static const CGSize GridSize = { 32, 32 };
-static const int BatchNodeZOrder = 0;
-static const int OverlayZOrder = 1;
+static const int TileMapZOrder = 0;
+static const int BatchNodeZOrder = 1;
+static const int OverlayZOrder = 2;
 static const CGFloat JoystickVelocityMultiplier = 1;
+static NSString * const DemoMap = @"Demo.tmx";
 
 @interface GameLayer ()
 
 @property (nonatomic, strong) SneakyInputLayer *sneakyInputLayer;
+@property (nonatomic, strong) CCTMXTiledMap *tileMap;
 @property (nonatomic, strong) CCSpriteBatchNode *bombermanBatchNode;
 @property (nonatomic, strong) Bomberman *bomberman;
 
 
 - (void)preloadResources;
+- (void)loadTileMap;
 - (void)loadBatchNodes;
+- (void)createSneakyInputLayer;
+- (void)createBomberman;
+
 
 @end
 
 @implementation GameLayer
 
+@synthesize sneakyInputLayer = _sneakyInputLayer;
+@synthesize tileMap = _tileMap;
 @synthesize bombermanBatchNode = _bombermanBatchNode;
 @synthesize bomberman = _bomberman;
-@synthesize sneakyInputLayer = _sneakyInputLayer;
 
 -(id) init
 {
@@ -39,15 +47,10 @@ static const CGFloat JoystickVelocityMultiplier = 1;
 	if (self)
 	{
         [self preloadResources];
-        
-        self.sneakyInputLayer = [[SneakyInputLayer alloc] init];
-        [self addChild:self.sneakyInputLayer z:OverlayZOrder];
-        
+        [self loadTileMap];
+        [self createSneakyInputLayer];
         [self loadBatchNodes];
-        self.bomberman = [[Bomberman alloc] init];
-        [self.bombermanBatchNode addChild:self.bomberman];
-        
-        [self.bomberman setPosition:CGPointMake(240, 160)];
+        [self createBomberman];
         
         [self scheduleUpdate];
 	}
@@ -85,10 +88,31 @@ static const CGFloat JoystickVelocityMultiplier = 1;
     self.bomberman.position = bombermanPosition;
 }
 
+- (void)createBomberman
+{
+    self.bomberman = [[Bomberman alloc] init];
+    [self.bombermanBatchNode addChild:self.bomberman];
+    
+    [self.bomberman setPosition:CGPointMake(240, 160)];
+    
+}
+
+- (void)createSneakyInputLayer
+{
+    self.sneakyInputLayer = [[SneakyInputLayer alloc] init];
+    [self addChild:self.sneakyInputLayer z:OverlayZOrder];
+}
+
 - (void)loadBatchNodes
 {
     self.bombermanBatchNode = [Bomberman spriteBatchNode];
     [self addChild:self.bombermanBatchNode z:BatchNodeZOrder];
+}
+
+- (void)loadTileMap
+{
+    self.tileMap = [CCTMXTiledMap tiledMapWithTMXFile:DemoMap];
+    [self addChild:self.tileMap z:TileMapZOrder];
 }
 
 - (void)preloadResources
