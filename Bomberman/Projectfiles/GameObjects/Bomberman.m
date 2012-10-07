@@ -8,6 +8,8 @@
 
 #import "Bomberman.h"
 
+static const int BombermanHp = 5;
+
 @interface Bomberman ()
 
 @end
@@ -24,7 +26,7 @@
 {
 	if (self = [super initWithAnimPrefix:BombermanAnimPrefix side:side])
 	{
-        
+        self.hp = BombermanHp;
 	}
 	return self;
 }

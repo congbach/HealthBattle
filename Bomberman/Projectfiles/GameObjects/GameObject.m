@@ -29,6 +29,8 @@ static const NSInteger GameObjectMovingAnimTag = 9999;
 @synthesize facingDirection = _facingDirection;
 @synthesize side = _side;
 
+@synthesize hp = _hp;
+
 - (id)initWithAnimPrefix:(NSString *)prefix side:(GameObjectSide)side
 {
     NSString *idleSpriteFrameName = [NSString stringWithFormat:@"%@_01", prefix];

@@ -313,14 +313,6 @@ static const CGFloat ProjectileVelocity = 2.0f;
             [toBeDestroyedProjectiles removeLastObject];
         }
         
-        NSMutableArray *serverProjectilesStates = [NSMutableArray arrayWithCapacity:self.alliesProjectiles.count];
-        for (Projectile *projectile in self.alliesProjectiles)
-        {
-            GameObjectState *projectileState = [[GameObjectState alloc] initWithIdentifier:projectile.identifier position:projectile.position velocity:CGPointZero direction:projectile.direction];
-            [serverProjectilesStates addObject:projectileState];
-        }
-        gameState.serverProjectilesStates = [NSArray arrayWithArray:serverProjectilesStates];
-        
         for (Projectile *projectile in self.enemiesProjectiles)
         {
             CGPoint unitVelocity = [self unitVelocityWithDirection:projectile.direction];
@@ -336,6 +328,42 @@ static const CGFloat ProjectileVelocity = 2.0f;
             [self.projectileBatchNode removeChild:[toBeDestroyedProjectiles lastObject] cleanup:YES];
             [toBeDestroyedProjectiles removeLastObject];
         }
+        
+        NSMutableArray *toBeDestroyedAlliesProjectiles = [NSMutableArray array];
+        NSMutableArray *toBeDestroyedEnemiesProjectiles = [NSMutableArray array];
+        
+        for (Projectile *allyProjectile in self.alliesProjectiles)
+            for (Projectile *enemyProjectile in self.enemiesProjectiles)
+            {
+                if (CGRectIntersectsRect(allyProjectile.boundingBox, enemyProjectile.boundingBox))
+                {
+                    if (! [toBeDestroyedAlliesProjectiles containsObject:allyProjectile])
+                        [toBeDestroyedAlliesProjectiles addObject:allyProjectile];
+                    if (! [toBeDestroyedEnemiesProjectiles containsObject:enemyProjectile])
+                        [toBeDestroyedEnemiesProjectiles addObject:enemyProjectile];
+                }
+            }
+        
+        [self.alliesProjectiles removeObjectsInArray:toBeDestroyedAlliesProjectiles];
+        while (toBeDestroyedAlliesProjectiles.count)
+        {
+            [self.projectileBatchNode removeChild:[toBeDestroyedAlliesProjectiles lastObject] cleanup:YES];
+            [toBeDestroyedAlliesProjectiles removeLastObject];
+        }
+        [self.enemiesProjectiles removeObjectsInArray:toBeDestroyedEnemiesProjectiles];
+        while (toBeDestroyedEnemiesProjectiles.count)
+        {
+            [self.projectileBatchNode removeChild:[toBeDestroyedEnemiesProjectiles lastObject] cleanup:YES];
+            [toBeDestroyedEnemiesProjectiles removeLastObject];
+        }
+        
+        NSMutableArray *serverProjectilesStates = [NSMutableArray arrayWithCapacity:self.alliesProjectiles.count];
+        for (Projectile *projectile in self.alliesProjectiles)
+        {
+            GameObjectState *projectileState = [[GameObjectState alloc] initWithIdentifier:projectile.identifier position:projectile.position velocity:CGPointZero direction:projectile.direction];
+            [serverProjectilesStates addObject:projectileState];
+        }
+        gameState.serverProjectilesStates = [NSArray arrayWithArray:serverProjectilesStates];
         
         NSMutableArray *clientProjectilesStates = [NSMutableArray arrayWithCapacity:self.enemiesProjectiles.count];
         for (Projectile *projectile in self.enemiesProjectiles)

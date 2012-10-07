@@ -25,4 +25,6 @@ typedef enum { kGameObjectSideAlly, kGameObjectSideEnemy } GameObjectSide;
 @property (nonatomic, readonly, assign) Direction facingDirection;
 @property (nonatomic, readonly) NSString *identifier;
 
+@property (nonatomic, assign) int hp;
+
 @end
