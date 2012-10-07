@@ -25,6 +25,54 @@ static UIEdgeInsets GameObjectEdgeInsets = { 3, 3, 3, 3 };
 static const CGFloat ProjectileVelocity = 2.0f;
 
 
+#pragma mark - PlayerAction
+
+@interface PlayerAction : NSObject<NSCoding>
+
+@property (nonatomic, readwrite, assign) Direction joystickDirection;
+@property (nonatomic, readwrite, assign) BOOL padButtonActive;
+
+- (id)initWithJoystickDirection:(Direction)direction padButtonActive:(BOOL)padButtonActive;
+
+@end
+
+
+@implementation PlayerAction
+
+@synthesize joystickDirection = _joystickDirection;
+@synthesize padButtonActive = _padButtonActive;
+
+- (id)initWithJoystickDirection:(Direction)direction padButtonActive:(BOOL)padButtonActive
+{
+    if (self = [super init])
+    {
+        self.joystickDirection = direction;
+        self.padButtonActive = padButtonActive;
+    }
+    return self;
+}
+
+- (id)initWithCoder:(NSCoder *)decoder
+{
+    if (self = [super init])
+    {
+        self.joystickDirection = [decoder decodeIntForKey:@"joystickDirection"];
+        self.padButtonActive = [decoder decodeBoolForKey:@"padButtonActive"];
+    }
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)encoder
+{
+    [encoder encodeInt:(int)self.joystickDirection forKey:@"joystickDirection"];
+    [encoder encodeBool:self.padButtonActive forKey:@"padButtonActive"];
+}
+
+@end
+
+
+#pragma mark - GameLayer
+
 @interface GameLayer () <GKPeerPickerControllerDelegate, GKSessionDelegate, UIAlertViewDelegate>
 
 @property (nonatomic, strong) GKSession *gkSession;
@@ -42,6 +90,8 @@ static const CGFloat ProjectileVelocity = 2.0f;
 @property (nonatomic, strong) NSMutableArray *enemies;
 @property (nonatomic, strong) NSMutableArray *alliesProjectiles;
 @property (nonatomic, strong) NSMutableArray *enemiesProjectiles;
+@property (nonatomic, strong) PlayerAction *clientPlayerAction;
+@property (nonatomic, assign) Direction lastJoystickDirection;
 
 
 - (void)preloadResources;
@@ -77,6 +127,8 @@ static const CGFloat ProjectileVelocity = 2.0f;
 @synthesize enemies = _enemies;
 @synthesize alliesProjectiles = alliesProjectiles;
 @synthesize enemiesProjectiles = _enemiesProjectiles;
+@synthesize clientPlayerAction = _clientPlayerAction;
+@synthesize lastJoystickDirection = _lastJoystickDirection;
 
 -(id) init
 {
@@ -106,50 +158,81 @@ static const CGFloat ProjectileVelocity = 2.0f;
 
 -(void) update:(ccTime)delta
 {
-    Direction joystickDirection = self.sneakyInputLayer.joystickDirection;
-    if (joystickDirection != kNoDirection)
-        [self.bomberman playMovingAnimWithDirection:joystickDirection];
+    if (self.gkSession.sessionMode == GKSessionModeServer)
+    {
+        Direction joystickDirection = self.sneakyInputLayer.joystickDirection;
+        if (joystickDirection != kNoDirection)
+            [self.bomberman playMovingAnimWithDirection:joystickDirection];
+        else
+            [self.bomberman stopMovingAnim];
+        
+        [self moveGameObject:self.bomberman direction:joystickDirection isPlayer:YES];
+        
+        if (self.sneakyInputLayer.padButtonActive)
+            //[self addBombAtTileCoord:[self tileCoordForPosition:self.bomberman.position]];
+            [self shootProjectileFromGameObject:self.bomberman direction:self.bomberman.facingDirection];
+        
+        if (self.clientPlayerAction)
+        {
+            joystickDirection = self.clientPlayerAction.joystickDirection;
+            if (joystickDirection != kNoDirection)
+                [self.enemyBomberman playMovingAnimWithDirection:joystickDirection];
+            else
+                [self.enemyBomberman stopMovingAnim];
+            
+            [self moveGameObject:self.enemyBomberman direction:joystickDirection isPlayer:YES];
+            
+            if (self.clientPlayerAction.padButtonActive)
+            {
+                //[self addBombAtTileCoord:[self tileCoordForPosition:self.bomberman.position]];
+                [self shootProjectileFromGameObject:self.bomberman direction:self.bomberman.facingDirection];
+                self.clientPlayerAction.padButtonActive = NO;
+            }
+        }
+        
+        
+        NSMutableArray *toBeDestroyedProjectiles = [NSMutableArray array];
+        for (Projectile *projectile in self.alliesProjectiles)
+        {
+            CGPoint unitVelocity = [self unitVelocityWithDirection:projectile.direction];
+            CGPoint tileCoord = [self tileCoordForPosition:projectile.position];
+            CGPoint nextTileCoord = CGPointMake(tileCoord.x + unitVelocity.x, tileCoord.y - unitVelocity.y);
+            int tileGid = [self.tileMapBackgroundLayer tileGIDAt:nextTileCoord];
+            if (tileGid && CGRectIntersectsRect([self tileBoundingBoxAtTileCoord:nextTileCoord], [projectile boundingBox]))
+                [toBeDestroyedProjectiles addObject:projectile];
+        }
+        [self.alliesProjectiles removeObjectsInArray:toBeDestroyedProjectiles];
+        while (toBeDestroyedProjectiles.count)
+        {
+            [self.projectileBatchNode removeChild:[toBeDestroyedProjectiles lastObject] cleanup:YES];
+            [toBeDestroyedProjectiles removeLastObject];
+        }
+        
+        for (Projectile *projectile in self.alliesProjectiles)
+        {
+            CGPoint unitVelocity = [self unitVelocityWithDirection:projectile.direction];
+            CGPoint tileCoord = [self tileCoordForPosition:projectile.position];
+            CGPoint nextTileCoord = CGPointMake(tileCoord.x + unitVelocity.x, tileCoord.y - unitVelocity.y);
+            int tileGid = [self.tileMapBackgroundLayer tileGIDAt:nextTileCoord];
+            if (tileGid && CGRectIntersectsRect([self tileBoundingBoxAtTileCoord:nextTileCoord], [projectile boundingBox]))
+                [toBeDestroyedProjectiles addObject:projectile];
+        }
+        [self.enemiesProjectiles removeObjectsInArray:toBeDestroyedProjectiles];
+        while (toBeDestroyedProjectiles.count)
+        {
+            [self.projectileBatchNode removeChild:[toBeDestroyedProjectiles lastObject] cleanup:YES];
+            [toBeDestroyedProjectiles removeLastObject];
+        }
+    }
     else
-        [self.bomberman stopMovingAnim];
-    
-    [self moveGameObject:self.bomberman direction:joystickDirection isPlayer:YES];
-    
-    if (self.sneakyInputLayer.padButtonActive)
-        //[self addBombAtTileCoord:[self tileCoordForPosition:self.bomberman.position]];
-        [self shootProjectileFromGameObject:self.bomberman direction:self.bomberman.facingDirection];
-    
-    
-    NSMutableArray *toBeDestroyedProjectiles = [NSMutableArray array];
-    for (Projectile *projectile in self.alliesProjectiles)
     {
-        CGPoint unitVelocity = [self unitVelocityWithDirection:projectile.direction];
-        CGPoint tileCoord = [self tileCoordForPosition:projectile.position];
-        CGPoint nextTileCoord = CGPointMake(tileCoord.x + unitVelocity.x, tileCoord.y - unitVelocity.y);
-        int tileGid = [self.tileMapBackgroundLayer tileGIDAt:nextTileCoord];
-        if (tileGid && CGRectIntersectsRect([self tileBoundingBoxAtTileCoord:nextTileCoord], [projectile boundingBox]))
-            [toBeDestroyedProjectiles addObject:projectile];
-    }
-    [self.alliesProjectiles removeObjectsInArray:toBeDestroyedProjectiles];
-    while (toBeDestroyedProjectiles.count)
-    {
-        [self.projectileBatchNode removeChild:[toBeDestroyedProjectiles lastObject] cleanup:YES];
-        [toBeDestroyedProjectiles removeLastObject];
-    }
-    
-    for (Projectile *projectile in self.alliesProjectiles)
-    {
-        CGPoint unitVelocity = [self unitVelocityWithDirection:projectile.direction];
-        CGPoint tileCoord = [self tileCoordForPosition:projectile.position];
-        CGPoint nextTileCoord = CGPointMake(tileCoord.x + unitVelocity.x, tileCoord.y - unitVelocity.y);
-        int tileGid = [self.tileMapBackgroundLayer tileGIDAt:nextTileCoord];
-        if (tileGid && CGRectIntersectsRect([self tileBoundingBoxAtTileCoord:nextTileCoord], [projectile boundingBox]))
-            [toBeDestroyedProjectiles addObject:projectile];
-    }
-    [self.enemiesProjectiles removeObjectsInArray:toBeDestroyedProjectiles];
-    while (toBeDestroyedProjectiles.count)
-    {
-        [self.projectileBatchNode removeChild:[toBeDestroyedProjectiles lastObject] cleanup:YES];
-        [toBeDestroyedProjectiles removeLastObject];
+        Direction joystickDirection = self.sneakyInputLayer.joystickDirection;
+        if (joystickDirection != self.lastJoystickDirection || self.sneakyInputLayer.padButtonActive)
+        {
+            PlayerAction *playAction = [[PlayerAction alloc] initWithJoystickDirection:joystickDirection padButtonActive:self.sneakyInputLayer.padButtonActive];
+            [self sendDataToServer:[NSKeyedArchiver archivedDataWithRootObject:playAction]];
+        }
+        self.lastJoystickDirection = joystickDirection;
     }
 }
 
@@ -424,6 +507,7 @@ static const CGFloat ProjectileVelocity = 2.0f;
             self.enemies = [NSMutableArray array];
             self.alliesProjectiles = [NSMutableArray array];
             self.enemiesProjectiles = [NSMutableArray array];
+            self.lastJoystickDirection = kNoDirection;
             
             [self scheduleUpdate];
             break;
@@ -467,7 +551,8 @@ static const CGFloat ProjectileVelocity = 2.0f;
 
 - (void)sendDataToServer:(NSData *)data
 {
-    
+    if (self.gkSession && self.gkSession.sessionMode == GKSessionModeClient)
+        [self.gkSession sendDataToAllPeers:data withDataMode:GKSendDataReliable error:nil];
 }
 
 - (void)broadcastDataToClients:(NSData *)data
@@ -477,7 +562,14 @@ static const CGFloat ProjectileVelocity = 2.0f;
 
 - (void)receiveData:(NSData *)data fromPeer:(NSString *)peer inSession:(GKSession *)session context:(void *)context
 {
-    
+    if (self.gkSession.sessionMode == GKSessionModeServer)
+    {
+        self.clientPlayerAction = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+    }
+    else
+    {
+        
+    }
 }
 
 
