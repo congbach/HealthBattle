@@ -12,5 +12,6 @@
 @interface SneakyInputLayer : CCLayer
 
 @property (nonatomic, readonly) Direction joystickDirection;
+@property (nonatomic, readonly) BOOL padButtonActive;
 
 @end

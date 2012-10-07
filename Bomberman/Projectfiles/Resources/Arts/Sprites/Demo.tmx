@@ -13,9 +13,18 @@
    </properties>
   </tile>
  </tileset>
+ <tileset firstgid="3" name="PowerUps" tilewidth="24" tileheight="24">
+  <tileoffset x="4" y="-4"/>
+  <image source="PowerUps.png" width="600" height="432"/>
+ </tileset>
  <layer name="Background" width="15" height="10">
   <data encoding="base64" compression="gzip">
    H4sIAAAAAAAAA2NkYGBgpADDABMD8QBZLyNULyl8GJsJB8blJkL2ErKfWP8SspdY+9D1ErIHHcD0MiHxiaGR9ZKLAU6Fpa5YAgAA
+  </data>
+ </layer>
+ <layer name="PowerUps" width="15" height="10">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAA2NgGDjAPETtRdfPgsRmJUI/C2ElJJnBioNNbTtJAQCPFo2KWAIAAA==
   </data>
  </layer>
 </map>

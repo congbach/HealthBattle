@@ -9,6 +9,7 @@
 #import "GameLayer.h"
 #import "SneakyInputLayer.h"
 #import "Bomberman.h"
+#import "Bomb.h"
 
 static const CGSize GridSize = { 32, 32 };
 static const int TileMapZOrder = 0;
@@ -17,6 +18,7 @@ static const int OverlayZOrder = 2;
 static const CGFloat GameObjectMovingVelocity = 1.0f;
 static NSString * const DemoMap = @"Demo.tmx";
 static NSString * const TileMapBackgroundLayerName = @"Background";
+static NSString * const TileMapPowerUpsLayerName = @"PowerUps";
 static UIEdgeInsets GameObjectEdgeInsets = { 3, 3, 3, 3 };
 
 @interface GameLayer ()
@@ -24,8 +26,11 @@ static UIEdgeInsets GameObjectEdgeInsets = { 3, 3, 3, 3 };
 @property (nonatomic, strong) SneakyInputLayer *sneakyInputLayer;
 @property (nonatomic, strong) CCTMXTiledMap *tileMap;
 @property (nonatomic, strong) CCTMXLayer *tileMapBackgroundLayer;
+@property (nonatomic, strong) CCTMXLayer *tileMapPowerUpsLayer;
 @property (nonatomic, strong) CCSpriteBatchNode *bombermanBatchNode;
+@property (nonatomic, strong) CCSpriteBatchNode *bombBatchNode;
 @property (nonatomic, strong) Bomberman *bomberman;
+@property (nonatomic, strong) NSMutableDictionary *bombs;
 
 
 - (void)preloadResources;
@@ -34,7 +39,8 @@ static UIEdgeInsets GameObjectEdgeInsets = { 3, 3, 3, 3 };
 - (void)createSneakyInputLayer;
 - (void)createBomberman;
 
-- (void)moveGameObject:(GameObject *)gameObject direction:(Direction)direction;
+- (BOOL)moveGameObject:(GameObject *)gameObject direction:(Direction)direction isPlayer:(BOOL)isPlayer;
+- (BOOL)addBombAtTileCoord:(CGPoint)tileCoord;
 
 - (CGPoint)tileCoordForPosition:(CGPoint)position;
 
@@ -47,6 +53,7 @@ static UIEdgeInsets GameObjectEdgeInsets = { 3, 3, 3, 3 };
 @synthesize tileMapBackgroundLayer = _tileMapBackgroundLayer;
 @synthesize bombermanBatchNode = _bombermanBatchNode;
 @synthesize bomberman = _bomberman;
+@synthesize bombs = _bombs;
 
 -(id) init
 {
@@ -58,6 +65,8 @@ static UIEdgeInsets GameObjectEdgeInsets = { 3, 3, 3, 3 };
         [self createSneakyInputLayer];
         [self loadBatchNodes];
         [self createBomberman];
+        
+        self.bombs = [NSMutableDictionary dictionary];
         
         [self scheduleUpdate];
 	}
@@ -81,15 +90,16 @@ static UIEdgeInsets GameObjectEdgeInsets = { 3, 3, 3, 3 };
 
 -(void) update:(ccTime)delta
 {
-    // Move bomerman
-    
     Direction joystickDirection = self.sneakyInputLayer.joystickDirection;
     if (joystickDirection != kNoDirection)
         [self.bomberman playMovingAnimWithDirection:joystickDirection];
     else
         [self.bomberman stopMovingAnim];
     
-    [self moveGameObject:self.bomberman direction:joystickDirection];
+    [self moveGameObject:self.bomberman direction:joystickDirection isPlayer:YES];
+    
+    if (self.sneakyInputLayer.padButtonActive)
+        [self addBombAtTileCoord:[self tileCoordForPosition:self.bomberman.position]];
 }
 
 - (void)createBomberman
@@ -116,6 +126,9 @@ static UIEdgeInsets GameObjectEdgeInsets = { 3, 3, 3, 3 };
 {
     self.bombermanBatchNode = [Bomberman spriteBatchNode];
     [self addChild:self.bombermanBatchNode z:BatchNodeZOrder];
+    
+    self.bombBatchNode = [Bomb spriteBatchNode];
+    [self addChild:self.bombBatchNode z:BatchNodeZOrder];
 }
 
 - (void)loadTileMap
@@ -124,17 +137,19 @@ static UIEdgeInsets GameObjectEdgeInsets = { 3, 3, 3, 3 };
     [self addChild:self.tileMap z:TileMapZOrder];
     
     self.tileMapBackgroundLayer = [self.tileMap layerNamed:TileMapBackgroundLayerName];
+    self.tileMapPowerUpsLayer = [self.tileMap layerNamed:TileMapPowerUpsLayerName];
 }
 
 - (void)preloadResources
 {
     [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:GAME_OBJECT_PLIST_WITH_PREFIX(BombermanAnimPrefix) textureFilename:GAME_OBJECT_SPRITE_BATCH_NODE_WITH_PREFIX(BombermanAnimPrefix)];
+    [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:GAME_OBJECT_PLIST_WITH_PREFIX(BombAnimPrefix) textureFilename:GAME_OBJECT_SPRITE_BATCH_NODE_WITH_PREFIX(BombAnimPrefix)];
 }
 
-- (void)moveGameObject:(GameObject *)gameObject direction:(Direction)direction
+- (BOOL)moveGameObject:(GameObject *)gameObject direction:(Direction)direction isPlayer:(BOOL)isPlayer
 {
     if (direction == kNoDirection)
-        return;
+        return YES;
     
     CGPoint unitVelocity = CGPointZero;
     
@@ -161,7 +176,6 @@ static UIEdgeInsets GameObjectEdgeInsets = { 3, 3, 3, 3 };
             break;
     }
     
-    BOOL canMoveObject = YES;
     NSMutableArray *tilesToCheck = [NSMutableArray array];
     CGPoint tileCoord = [self tileCoordForPosition:gameObject.position];
     [tilesToCheck addObject:[NSValue valueWithCGPoint:CGPointMake(tileCoord.x + unitVelocity.x, tileCoord.y - unitVelocity.y)]];
@@ -206,19 +220,39 @@ static UIEdgeInsets GameObjectEdgeInsets = { 3, 3, 3, 3 };
                 else
                     position.y = fminf(tileCoordPosition.y, position.y);
                 gameObject.position = position;
-                canMoveObject = NO;
-                break;
+                
+                return NO;
             }
         }
     }
     
-    if (canMoveObject)
+    CGPoint position = gameObject.position;
+    position.x += unitVelocity.x * GameObjectMovingVelocity;
+    position.y += unitVelocity.y * GameObjectMovingVelocity;
+    gameObject.position = position;
+    
+    tileCoord = [self tileCoordForPosition:gameObject.position];
+    int powerUpTileGid = [self.tileMapPowerUpsLayer tileGIDAt:tileCoord];
+    if (powerUpTileGid)
     {
-        CGPoint position = gameObject.position;
-        position.x += unitVelocity.x * GameObjectMovingVelocity;
-        position.y += unitVelocity.y * GameObjectMovingVelocity;
-        gameObject.position = position;
+        NSDictionary *powerUpProperties = [self.tileMap propertiesForGID:powerUpTileGid];
+        [self.tileMapPowerUpsLayer removeTileAt:tileCoord];
     }
+    return YES;
+}
+
+- (BOOL)addBombAtTileCoord:(CGPoint)tileCoord
+{
+    NSValue *bombKey = [NSValue valueWithCGPoint:tileCoord];
+    if ([self.bombs objectForKey:bombKey])
+        return NO;
+    
+    Bomb *bomb = [[Bomb alloc] init];
+    bomb.position = [self positionForTileCoord:tileCoord];
+    [self.bombBatchNode addChild:bomb];
+    [self.bombs setObject:bomb forKey:bombKey];
+    
+    return YES;
 }
 
 

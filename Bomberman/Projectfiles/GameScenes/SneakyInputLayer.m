@@ -9,33 +9,48 @@
 #import "SneakyInputLayer.h"
 #import "SneakyJoystick.h"
 #import "SneakyJoystickSkinnedBase.h"
+#import "SneakyButton.h"
+#import "SneakyButtonSkinnedBase.h"
 #import "ColoredCircleSprite.h"
 
 static NSString * const JoystickImage = @"Joystick.png";
+static NSString * const PadButtonImage = @"GamePadButton.png";
 
 @interface SneakyInputLayer ()
 
 @property (nonatomic, strong) SneakyJoystick *joystick;
+@property (nonatomic, strong) SneakyButton *padButton;
 
 @end
 
 @implementation SneakyInputLayer
 
 @synthesize joystick = _joystick;
+@synthesize padButton = _padButton;
 
 -(id) init
 {
 	self = [super init];
 	if (self)
 	{
-        SneakyJoystickSkinnedBase *leftJoy = [[SneakyJoystickSkinnedBase alloc] init];
-		leftJoy.position = ccp(64,64);
-		leftJoy.backgroundSprite = [CCSprite spriteWithFile:JoystickImage];
-        leftJoy.backgroundSprite.opacity = 128;
-		leftJoy.joystick = [[SneakyJoystick alloc] initWithRect:CGRectMake(0, 0, leftJoy.backgroundSprite.size.width, leftJoy.backgroundSprite.size.height)];
-        leftJoy.joystick.isDPad = YES;
-		[self addChild:leftJoy];
-        self.joystick = leftJoy.joystick;
+        SneakyJoystickSkinnedBase *joystick = [[SneakyJoystickSkinnedBase alloc] init];
+		joystick.position = ccp(64, 64);
+		joystick.backgroundSprite = [CCSprite spriteWithFile:JoystickImage];
+        joystick.backgroundSprite.opacity = 128;
+		joystick.joystick = [[SneakyJoystick alloc] initWithRect:CGRectMake(0, 0, joystick.backgroundSprite.size.width, joystick.backgroundSprite.size.height)];
+        joystick.joystick.isDPad = YES;
+		[self addChild:joystick];
+        self.joystick = joystick.joystick;
+        
+        SneakyButtonSkinnedBase *padButton = [[SneakyButtonSkinnedBase alloc] init];
+		padButton.position = ccp(430, 56);
+		padButton.defaultSprite = [CCSprite spriteWithFile:PadButtonImage];
+        padButton.activatedSprite = [CCSprite spriteWithFile:PadButtonImage];
+        padButton.pressSprite = [CCSprite spriteWithFile:PadButtonImage];
+        padButton.defaultSprite.opacity = 128;
+		padButton.button = [[SneakyButton alloc] initWithRect:CGRectMake(0, 0, padButton.defaultSprite.size.width, padButton.defaultSprite.size.height)];
+		self.padButton = padButton.button;
+		[self addChild:padButton];
 	}
 	return self;
 }
@@ -61,6 +76,11 @@ static NSString * const JoystickImage = @"Joystick.png";
         return self.joystick.velocity.y == 1 ? kDirectionUp : self.joystick.velocity.y == -1 ? kDirectionDown : kNoDirection;
     else
         return self.joystick.velocity.x == 1 ? kDirectionRight : kDirectionLeft;
+}
+
+- (BOOL)padButtonActive
+{
+    return self.padButton.active;
 }
 
 @end
