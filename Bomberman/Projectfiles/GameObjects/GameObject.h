@@ -9,19 +9,19 @@
 #import "kobold2d.h"
 #import "GameCommon.h"
 
-#define GAME_OBJECT_SPRITE_BATCH_NODE_WITH_PREFIX(prefix) \
-    [NSString stringWithFormat:@"%@.png", prefix]
-#define GAME_OBJECT_PLIST_WITH_PREFIX(prefix) \
-    [NSString stringWithFormat:@"%@.plist", prefix]
-
 static const CGSize GameObjectSize = { 40, 50 };
 static const int GameObjectSpriteBatchNodeRow = 4;
 static const int GameObjectSpriteBatchNodeCol = 4;
 
+typedef enum { kGameObjectSideAlly, kGameObjectSideEnemy } GameObjectSide;
+
 @interface GameObject : CCSprite
 
-- (id)initWithAnimPrefix:(NSString *)prefix;
+- (id)initWithAnimPrefix:(NSString *)prefix side:(GameObjectSide)side;
 - (void)playMovingAnimWithDirection:(Direction)direction;
 - (void)stopMovingAnim;
+
+@property (nonatomic, readonly, assign) GameObjectSide side;
+@property (nonatomic, readonly, assign) Direction facingDirection;
 
 @end

@@ -15,4 +15,6 @@ static NSString * const BombermanAnimPrefix = @"Bomberman";
 
 + (CCSpriteBatchNode *)spriteBatchNode;
 
+- (id)initWithSide:(GameObjectSide)side;
+
 @end

@@ -15,7 +15,8 @@ static const NSInteger GameObjectMovingAnimTag = 9999;
 @interface GameObject ()
 
 @property (nonatomic, strong) NSString *animPrefix;
-@property (nonatomic, assign) Direction facingDirection;
+@property (nonatomic, readwrite, assign) Direction facingDirection;
+@property (nonatomic, readwrite, assign) GameObjectSide side;
 
 - (NSString *)animFormatWithDirection:(Direction)direction;
 - (int)animFirstIndexWithDirection:(Direction)direction;
@@ -26,8 +27,9 @@ static const NSInteger GameObjectMovingAnimTag = 9999;
 
 @synthesize animPrefix = _animPrefix;
 @synthesize facingDirection = _facingDirection;
+@synthesize side = _side;
 
-- (id)initWithAnimPrefix:(NSString *)prefix
+- (id)initWithAnimPrefix:(NSString *)prefix side:(GameObjectSide)side
 {
     NSString *idleSpriteFrameName = [NSString stringWithFormat:@"%@_01", prefix];
     

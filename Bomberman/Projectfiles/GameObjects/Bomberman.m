@@ -16,13 +16,13 @@
 
 + (CCSpriteBatchNode *)spriteBatchNode
 {
-    return [CCSpriteBatchNode batchNodeWithFile:GAME_OBJECT_SPRITE_BATCH_NODE_WITH_PREFIX(BombermanAnimPrefix) capacity:GameObjectSpriteBatchNodeRow * GameObjectSpriteBatchNodeCol];
+    return [CCSpriteBatchNode batchNodeWithFile:SPRITE_BATCH_NODE_WITH_NAME(BombermanAnimPrefix) capacity:GameObjectSpriteBatchNodeRow * GameObjectSpriteBatchNodeCol];
 }
 
 
--(id) init
+-(id) initWithSide:(GameObjectSide)side
 {
-	if (self = [super initWithAnimPrefix:BombermanAnimPrefix])
+	if (self = [super initWithAnimPrefix:BombermanAnimPrefix side:side])
 	{
         
 	}

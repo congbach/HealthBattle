@@ -26,7 +26,7 @@ static const int BombExplodeAnimFramesCount = 3;
 
 + (CCSpriteBatchNode *)spriteBatchNode
 {
-    return [CCSpriteBatchNode batchNodeWithFile:GAME_OBJECT_SPRITE_BATCH_NODE_WITH_PREFIX(BombAnimPrefix) capacity:GameObjectSpriteBatchNodeRow * GameObjectSpriteBatchNodeCol];
+    return [CCSpriteBatchNode batchNodeWithFile:SPRITE_BATCH_NODE_WITH_NAME(BombAnimPrefix) capacity:BombTickAnimFramesCount + BombExplodeAnimFramesCount];
 }
 
 -(id) init
