@@ -23,7 +23,7 @@ static NSString * const DemoMap = @"Demo.tmx";
 static NSString * const TileMapBackgroundLayerName = @"Background";
 static NSString * const TileMapPowerUpsLayerName = @"PowerUps";
 static UIEdgeInsets GameObjectEdgeInsets = { 3, 3, 3, 3 };
-static const CGFloat ProjectileVelocity = 2.0f;
+static const CGFloat ProjectileVelocity = 3.5f;
 
 
 typedef enum { kNotGameOver, kServerWin, kClientWin } GameOverState;
