@@ -7,15 +7,15 @@
             <key>Projectile_Normal_01</key>
             <dict>
                 <key>frame</key>
-                <string>{{2,2},{20,14}}</string>
+                <string>{{2,2},{12,7}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
                 <false/>
                 <key>sourceColorRect</key>
-                <string>{{0,0},{20,14}}</string>
+                <string>{{0,1},{12,7}}</string>
                 <key>sourceSize</key>
-                <string>{20,14}</string>
+                <string>{12,9}</string>
             </dict>
         </dict>
         <key>metadata</key>
@@ -25,9 +25,9 @@
             <key>realTextureFileName</key>
             <string>Projectile.png</string>
             <key>size</key>
-            <string>{24,18}</string>
+            <string>{16,11}</string>
             <key>smartupdate</key>
-            <string>$TexturePacker:SmartUpdate:6dc6fd492df035b16f01a4f1e2827588$</string>
+            <string>$TexturePacker:SmartUpdate:be3b0ba31eff4dc6d4dfa8330162f91d$</string>
             <key>textureFileName</key>
             <string>Projectile.png</string>
         </dict>
