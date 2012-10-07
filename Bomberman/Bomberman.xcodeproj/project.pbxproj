@@ -25,6 +25,8 @@
 		BE8D758C162143C4001EB16A /* Projectile.m in Sources */ = {isa = PBXBuildFile; fileRef = BE8D758B162143C4001EB16A /* Projectile.m */; };
 		BE8D758F16214982001EB16A /* Projectile.plist in Resources */ = {isa = PBXBuildFile; fileRef = BE8D758D16214982001EB16A /* Projectile.plist */; };
 		BE8D75931621498E001EB16A /* Projectile.png in Resources */ = {isa = PBXBuildFile; fileRef = BE8D75911621498E001EB16A /* Projectile.png */; };
+		BEFCC5AB1622146000FA6E84 /* Heart.png in Resources */ = {isa = PBXBuildFile; fileRef = BEFCC5AA1622146000FA6E84 /* Heart.png */; };
+		BEFCC5AE16221D8800FA6E84 /* background.png in Resources */ = {isa = PBXBuildFile; fileRef = BEFCC5AD16221D8800FA6E84 /* background.png */; };
 		DC193EB713B692D100500B56 /* GLES-Render.mm in Sources */ = {isa = PBXBuildFile; fileRef = DC193EB313B6872600500B56 /* GLES-Render.mm */; };
 		DC193EB813B692D100500B56 /* GLES-Render.mm in Sources */ = {isa = PBXBuildFile; fileRef = DC193EB313B6872600500B56 /* GLES-Render.mm */; };
 		DC193EBC13B6956F00500B56 /* ContactListener.mm in Sources */ = {isa = PBXBuildFile; fileRef = DC193EBB13B6956F00500B56 /* ContactListener.mm */; };
@@ -106,6 +108,8 @@
 		BE8D758B162143C4001EB16A /* Projectile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Projectile.m; sourceTree = "<group>"; };
 		BE8D758D16214982001EB16A /* Projectile.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Projectile.plist; sourceTree = "<group>"; };
 		BE8D75911621498E001EB16A /* Projectile.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Projectile.png; sourceTree = "<group>"; };
+		BEFCC5AA1622146000FA6E84 /* Heart.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Heart.png; sourceTree = "<group>"; };
+		BEFCC5AD16221D8800FA6E84 /* background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = background.png; sourceTree = "<group>"; };
 		DC193EB213B6872600500B56 /* GLES-Render.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GLES-Render.h"; sourceTree = "<group>"; };
 		DC193EB313B6872600500B56 /* GLES-Render.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "GLES-Render.mm"; sourceTree = "<group>"; };
 		DC193EBA13B6956F00500B56 /* ContactListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContactListener.h; sourceTree = "<group>"; };
@@ -270,9 +274,11 @@
 		BE7AA9F11620D4C8008498B1 /* Sprites */ = {
 			isa = PBXGroup;
 			children = (
+				BEFCC5AD16221D8800FA6E84 /* background.png */,
 				BE7AAA6D162134EB008498B1 /* Bomb.png */,
 				BE7AA9F71620D536008498B1 /* Bomberman.png */,
 				BE7AAA651621293D008498B1 /* GamePadButton.png */,
+				BEFCC5AA1622146000FA6E84 /* Heart.png */,
 				BE7AAA451620EDE5008498B1 /* Joystick.png */,
 				BE8D758516213D84001EB16A /* PowerUps.png */,
 				BE8D75911621498E001EB16A /* Projectile.png */,
@@ -532,6 +538,8 @@
 				BE8D758716213D84001EB16A /* PowerUps.png in Resources */,
 				BE8D758F16214982001EB16A /* Projectile.plist in Resources */,
 				BE8D75931621498E001EB16A /* Projectile.png in Resources */,
+				BEFCC5AB1622146000FA6E84 /* Heart.png in Resources */,
+				BEFCC5AE16221D8800FA6E84 /* background.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

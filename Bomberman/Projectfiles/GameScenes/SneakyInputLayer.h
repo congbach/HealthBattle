@@ -14,4 +14,6 @@
 @property (nonatomic, readonly) Direction joystickDirection;
 @property (nonatomic, readonly) BOOL padButtonActive;
 
+- (void)updatePlayerHp:(int)hp;
+
 @end

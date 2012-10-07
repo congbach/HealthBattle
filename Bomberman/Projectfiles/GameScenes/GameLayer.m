@@ -14,9 +14,10 @@
 
 static NSString * const GKSessionID = @"HealthPlay";
 static const CGSize GridSize = { 32, 32 };
-static const int TileMapZOrder = 0;
-static const int BatchNodeZOrder = 1;
-static const int OverlayZOrder = 2;
+static const int BackgroundZOrder = 0;
+static const int TileMapZOrder = 1;
+static const int BatchNodeZOrder = 2;
+static const int OverlayZOrder = 3;
 static const CGFloat GameObjectMovingVelocity = 1.0f;
 static NSString * const DemoMap = @"Demo.tmx";
 static NSString * const TileMapBackgroundLayerName = @"Background";
@@ -389,15 +390,19 @@ typedef enum { kNotGameOver, kServerWin, kClientWin } GameOverState;
             if (CGRectIntersectsRect(allyProjectile.boundingBox, self.enemyBomberman.boundingBox))
             {
                 if (! [toBeDestroyedAlliesProjectiles containsObject:allyProjectile])
+                {
                     [toBeDestroyedAlliesProjectiles addObject:allyProjectile];
-                self.enemyBomberman.hp--;
+                    self.enemyBomberman.hp--;
+                }
             }
         for (Projectile *enemyProjectile in self.enemiesProjectiles)
             if (CGRectIntersectsRect(enemyProjectile.boundingBox, self.bomberman.boundingBox))
             {
                 if (! [toBeDestroyedEnemiesProjectiles containsObject:enemyProjectile])
+                {
                     [toBeDestroyedEnemiesProjectiles addObject:enemyProjectile];
-                self.bomberman.hp--;
+                    self.bomberman.hp--;
+                }
             }
         [self.alliesProjectiles removeObjectsInArray:toBeDestroyedAlliesProjectiles];
         while (toBeDestroyedAlliesProjectiles.count)
@@ -431,6 +436,8 @@ typedef enum { kNotGameOver, kServerWin, kClientWin } GameOverState;
         gameState.serverBombermanState.hp = self.bomberman.hp;
         gameState.clientBombermanState.hp = self.enemyBomberman.hp;
         
+        [self.sneakyInputLayer updatePlayerHp:self.bomberman.hp];
+        
         if (self.bomberman.hp <= 0)
             gameState.gameOverState = kClientWin;
         else if (self.enemyBomberman.hp <= 0)
@@ -442,7 +449,7 @@ typedef enum { kNotGameOver, kServerWin, kClientWin } GameOverState;
         if (gameState.gameOverState != kNotGameOver)
         {
             BOOL win = gameState.gameOverState == kServerWin;
-            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Game Over" message:(win ? @"Congratulation! You won" : @"Better luck next time") delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Game Over" message:(win ? @"Congratulation! You won" : @"You lost. Better luck next time") delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
             
             [self unscheduleUpdate];
             [[CCDirector sharedDirector] pause];
@@ -463,18 +470,6 @@ typedef enum { kNotGameOver, kServerWin, kClientWin } GameOverState;
         // Update according to server
         if (self.serverGameState)
         {
-            if (self.serverGameState.gameOverState != kNotGameOver)
-            {
-                BOOL win = self.serverGameState.gameOverState == kClientWin;
-                UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Game Over" message:(win ? @"Congratulation! You won" : @"Better luck next time") delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
-                
-                [self unscheduleUpdate];
-                [[CCDirector sharedDirector] pause];
-                [alertView show];
-                
-                return;
-            }
-            
             joystickDirection = self.serverGameState.clientBombermanState.direction;
             if (joystickDirection != kNoDirection)
                 [self.bomberman playMovingAnimWithDirection:joystickDirection];
@@ -492,6 +487,7 @@ typedef enum { kNotGameOver, kServerWin, kClientWin } GameOverState;
             [self moveGameObject:self.enemyBomberman direction:joystickDirection isPlayer:YES];
             self.enemyBomberman.position = self.serverGameState.serverBombermanState.position;
             self.enemyBomberman.hp = self.serverGameState.serverBombermanState.hp;
+            
             
             NSArray *alliesProjectilesStates = self.serverGameState.clientProjectilesStates;
             NSMutableDictionary *oldAlliesProjectiles = [NSMutableDictionary dictionaryWithCapacity:self.alliesProjectiles.count];
@@ -542,6 +538,19 @@ typedef enum { kNotGameOver, kServerWin, kClientWin } GameOverState;
             for (Projectile *projectile in [oldEnemiesProjectiles allValues])
                 [self.projectileBatchNode removeChild:projectile cleanup:YES];
             
+            [self.sneakyInputLayer updatePlayerHp:self.bomberman.hp];
+            
+            if (self.serverGameState.gameOverState != kNotGameOver)
+            {
+                BOOL win = self.serverGameState.gameOverState == kClientWin;
+                UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Game Over" message:(win ? @"Congratulation! You won" : @"You lost. Better luck next time") delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+                
+                [self unscheduleUpdate];
+                [[CCDirector sharedDirector] pause];
+                [alertView show];
+                
+                return;
+            }
             
             self.serverGameState = nil;
         }
@@ -675,6 +684,7 @@ typedef enum { kNotGameOver, kServerWin, kClientWin } GameOverState;
         if (powerUpTileGid)
         {
             NSDictionary *powerUpProperties = [self.tileMap propertiesForGID:powerUpTileGid];
+            gameObject.hp++;
             [self.tileMapPowerUpsLayer removeTileAt:tileCoord];
         }
     }
@@ -830,6 +840,12 @@ typedef enum { kNotGameOver, kServerWin, kClientWin } GameOverState;
             self.alliesProjectiles = [NSMutableArray array];
             self.enemiesProjectiles = [NSMutableArray array];
             self.lastJoystickDirection = kNoDirection;
+            
+            {
+                CCSprite *background = [CCSprite spriteWithFile:@"background.png"];
+                background.position = CGPointMake(240, 160);
+                [self addChild:background];
+            }
             
             [self scheduleUpdate];
             break;

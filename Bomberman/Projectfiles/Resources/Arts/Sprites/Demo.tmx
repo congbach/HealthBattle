@@ -19,12 +19,12 @@
  </tileset>
  <layer name="Background" width="15" height="10">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA2NkYGBgpADDABMD8QBZLyNULyl8GJsJB8blJkL2ErKfWP8SspdY+9D1ErIHHcD0MiHxiaGR9ZKLAU6Fpa5YAgAA
+   H4sIAAAAAAAAA2NkYGBgpACTA5D1gmgmEvkwNhMOzIAkT4q9hOxH9i+62Qx45NDtJdY+dL2E7EEHML1MSHxiaGS95GIA4Y1V/lgCAAA=
   </data>
  </layer>
  <layer name="PowerUps" width="15" height="10">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA2NgGDjAPETtRdfPgsRmJUI/C2ElJJnBioNNbTtJAQCPFo2KWAIAAA==
+   H4sIAAAAAAAAA2NgGDgwd4jai65/Lh45WtiPz05cZtM7rAET5DloWAIAAA==
   </data>
  </layer>
 </map>

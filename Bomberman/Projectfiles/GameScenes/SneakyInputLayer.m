@@ -21,12 +21,15 @@ static NSString * const PadButtonImage = @"GamePadButton.png";
 @property (nonatomic, strong) SneakyJoystick *joystick;
 @property (nonatomic, strong) SneakyButton *padButton;
 
+@property (nonatomic, strong) NSMutableArray *heartSprites;
+
 @end
 
 @implementation SneakyInputLayer
 
 @synthesize joystick = _joystick;
 @synthesize padButton = _padButton;
+@synthesize heartSprites = _heartSprites;
 
 -(id) init
 {
@@ -51,8 +54,29 @@ static NSString * const PadButtonImage = @"GamePadButton.png";
 		padButton.button = [[SneakyButton alloc] initWithRect:CGRectMake(0, 0, padButton.defaultSprite.size.width, padButton.defaultSprite.size.height)];
 		self.padButton = padButton.button;
 		[self addChild:padButton];
+        
+        self.heartSprites = [NSMutableArray array];
 	}
 	return self;
+}
+
+- (void)updatePlayerHp:(int)hp
+{
+    for (int i = self.heartSprites.count; i < hp; i++)
+    {
+        CCSprite *heartSprite = [CCSprite spriteWithFile:@"Heart.png"];
+        heartSprite.position = CGPointMake(30 + i * 50, 290);
+        //heartSprite.opacity = 128;
+        [self addChild:heartSprite];
+        [self.heartSprites addObject:heartSprite];
+    }
+    
+    while ((int)self.heartSprites.count > hp)
+    {
+        [self removeChild:[self.heartSprites lastObject] cleanup:NO];
+        [self.heartSprites removeLastObject];
+    }
+
 }
 
 -(void) onEnter
