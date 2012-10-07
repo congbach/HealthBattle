@@ -12,6 +12,5 @@
 @interface SneakyInputLayer : CCLayer
 
 @property (nonatomic, readonly) Direction joystickDirection;
-@property (nonatomic, readonly) CGPoint joystickVelocity;
 
 @end

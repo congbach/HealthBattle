@@ -63,9 +63,4 @@ static NSString * const JoystickImage = @"Joystick.png";
         return self.joystick.velocity.x == 1 ? kDirectionRight : kDirectionLeft;
 }
 
-- (CGPoint)joystickVelocity
-{
-    return self.joystick.velocity;
-}
-
 @end
