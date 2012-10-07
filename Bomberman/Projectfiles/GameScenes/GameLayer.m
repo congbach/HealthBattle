@@ -12,6 +12,7 @@
 #import "Bomb.h"
 #import "Projectile.h"
 
+static NSString * const GKSessionID = @"HealthPlay";
 static const CGSize GridSize = { 32, 32 };
 static const int TileMapZOrder = 0;
 static const int BatchNodeZOrder = 1;
@@ -23,8 +24,10 @@ static NSString * const TileMapPowerUpsLayerName = @"PowerUps";
 static UIEdgeInsets GameObjectEdgeInsets = { 3, 3, 3, 3 };
 static const CGFloat ProjectileVelocity = 2.0f;
 
-@interface GameLayer ()
 
+@interface GameLayer () <GKPeerPickerControllerDelegate, GKSessionDelegate, UIAlertViewDelegate>
+
+@property (nonatomic, strong) GKSession *gkSession;
 @property (nonatomic, strong) SneakyInputLayer *sneakyInputLayer;
 @property (nonatomic, strong) CCTMXTiledMap *tileMap;
 @property (nonatomic, strong) CCTMXLayer *tileMapBackgroundLayer;
@@ -58,6 +61,7 @@ static const CGFloat ProjectileVelocity = 2.0f;
 
 @implementation GameLayer
 
+@synthesize gkSession = _gkSession;
 @synthesize sneakyInputLayer = _sneakyInputLayer;
 @synthesize tileMap = _tileMap;
 @synthesize tileMapBackgroundLayer = _tileMapBackgroundLayer;
@@ -77,19 +81,8 @@ static const CGFloat ProjectileVelocity = 2.0f;
 	self = [super init];
 	if (self)
 	{
-        [self preloadResources];
-        [self loadTileMap];
-        [self createSneakyInputLayer];
-        [self loadBatchNodes];
-        [self createBomberman];
-        
-        self.bombs = [NSMutableDictionary dictionary];
-        self.allies = [NSMutableArray array];
-        self.enemies = [NSMutableArray array];
-        self.alliesProjectiles = [NSMutableArray array];
-        self.enemiesProjectiles = [NSMutableArray array];
-        
-        [self scheduleUpdate];
+        UIAlertView *alerView = [[UIAlertView alloc] initWithTitle:@"Network" message:@"Please choose an option" delegate:self cancelButtonTitle:@"Host" otherButtonTitles:@"Join", nil];
+        [alerView show];
 	}
 	return self;
 }
@@ -373,6 +366,101 @@ static const CGFloat ProjectileVelocity = 2.0f;
     CGSize mapSize = self.tileMap.mapSize;
     CGSize tileSize = self.tileMap.tileSize;
     return CGPointMake((tileCoord.x + 0.5f) * tileSize.width, (mapSize.height - tileCoord.y - 0.5f) * tileSize.height);
+}
+
+
+#pragma mark - GKPeerPickerControllerDelegate
+
+- (void)peerPickerController:(GKPeerPickerController *)picker didConnectPeer:(NSString *)peerID toSession:(GKSession *)session
+{
+    self.gkSession = session;
+    session.delegate = self;
+    
+    picker.delegate = nil;
+    [picker dismiss];
+}
+
+
+#pragma mark - GKSessionDelegate
+
+- (void)session:(GKSession *)session peer:(NSString *)peerID didChangeState:(GKPeerConnectionState)state
+{
+    switch (state) {
+        case GKPeerStateAvailable:
+			NSLog(@"didChangeState: peer %@ available", [session displayNameForPeer:peerID]);
+            
+            if (session.sessionMode == GKSessionModeClient)
+                [session connectToPeer:peerID withTimeout:5];
+            break;
+            
+        case GKPeerStateConnected:
+			NSLog(@"didChangeState: peer %@ connected", [session displayNameForPeer:peerID]);
+            
+            [self preloadResources];
+            [self loadTileMap];
+            [self createSneakyInputLayer];
+            [self loadBatchNodes];
+            [self createBomberman];
+            
+            self.bombs = [NSMutableDictionary dictionary];
+            self.allies = [NSMutableArray array];
+            self.enemies = [NSMutableArray array];
+            self.alliesProjectiles = [NSMutableArray array];
+            self.enemiesProjectiles = [NSMutableArray array];
+            
+            [self scheduleUpdate];
+            break;
+            
+        case GKPeerStateDisconnected:
+			NSLog(@"didChangeState: peer %@ disconnected", [session displayNameForPeer:peerID]);
+            break;
+            
+        case GKPeerStateUnavailable:
+			NSLog(@"didChangeState: peer %@ unavailable", [session displayNameForPeer:peerID]);
+            break;
+            
+        case GKPeerStateConnecting:
+			NSLog(@"didChangeState: peer %@ connecting", [session displayNameForPeer:peerID]);
+            break;
+            
+        default:
+            break;
+    }
+}
+
+- (void)session:(GKSession *)session didReceiveConnectionRequestFromPeer:(NSString *)peerID
+{
+	NSLog(@"didReceiveConnectionRequestFromPeer: %@", [session displayNameForPeer:peerID]);
+    
+    [session acceptConnectionFromPeer:peerID error:nil];
+}
+
+- (void)session:(GKSession *)session connectionWithPeerFailed:(NSString *)peerID withError:(NSError *)error
+{
+	NSLog(@"connectionWithPeerFailed: peer: %@, error: %@", [session displayNameForPeer:peerID], error);    
+}
+
+- (void)session:(GKSession *)session didFailWithError:(NSError *)error
+{
+	NSLog(@"didFailWithError: error: %@", error);
+}
+
+
+
+#pragma mark - UIAlertViewDelegate
+
+- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+//    GKPeerPickerController *gkPeerPicker = [[GKPeerPickerController alloc] init];
+//    gkPeerPicker.delegate = self;
+//    gkPeerPicker.connectionTypesMask = GKPeerPickerConnectionTypeNearby;
+//    
+//    [gkPeerPicker show];
+    
+    GKSessionMode sessionMode = buttonIndex ? GKSessionModeClient : GKSessionModeServer;
+    self.gkSession = [[GKSession alloc] initWithSessionID:GKSessionID displayName:GKSessionID sessionMode:sessionMode];
+    self.gkSession.delegate = self;
+    self.gkSession.available = YES;
 }
 
 @end

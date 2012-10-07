@@ -9,9 +9,5 @@
 #import "kobold2d.h"
 
 @interface GamePreLoadLayer : CCLayer
-{
-@protected
-@private
-}
 
 @end
