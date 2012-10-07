@@ -102,10 +102,16 @@ static const NSInteger GameObjectMovingAnimTag = 9999;
 
 - (void)playMovingAnimWithDirection:(Direction)direction
 {
-    if (self.facingDirection != direction)
+    BOOL directionChanged = self.facingDirection != direction;
+    if (directionChanged)
         [self setFacingDirection:direction];
-    if (! [self getActionByTag:GameObjectMovingAnimTag])
+    
+    if (directionChanged || ! [self getActionByTag:GameObjectMovingAnimTag])
+    {
+        if (directionChanged)
+            [self stopActionByTag:GameObjectMovingAnimTag];
         [self playAnimLoopedWithFormat:[self animFormatWithDirection:direction] numFrames:GameObjectMovingAnimFramesCount firstIndex:[self animFirstIndexWithDirection:direction] delay:GameObjectMovingAnimDelay animateTag:GameObjectMovingAnimTag restoreOriginalFrame:YES];
+    }
 }
 
 - (void)stopMovingAnim
