@@ -11,6 +11,9 @@
 
 static const int ProjectileAnimFramesCount = 4;
 static const NSInteger ProjectileAnimTag = 9999;
+static NSString * const ProjectileIdentifierFormat = @"Projectile_%i";
+
+static int projectileIdentifierCounter = 0;
 
 @interface Projectile ()
 
@@ -24,6 +27,7 @@ static const NSInteger ProjectileAnimTag = 9999;
 
 @implementation Projectile
 
+@synthesize identifier = _identifier;
 @synthesize projectileType = _projectileType;
 @synthesize direction = _direction;
 
@@ -70,6 +74,7 @@ static const NSInteger ProjectileAnimTag = 9999;
 	{
         self.projectileType = projectileType;
         self.direction = direction;
+        self.identifier = [NSString stringWithFormat:ProjectileIdentifierFormat, projectileIdentifierCounter++];
         //[self playAnimLoopedWithFormat:[Projectile animFormatWithType:projectileType] numFrames:ProjectileAnimFramesCount firstIndex:01 delay:0.2f animateTag:ProjectileAnimTag];
 	}
 	return self;

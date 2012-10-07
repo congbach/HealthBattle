@@ -37,6 +37,7 @@ static const NSInteger GameObjectMovingAnimTag = 9999;
     {
         self.animPrefix = prefix;
         self.facingDirection = kDirectionRight;
+        self.side = side;
     }
     return self;
 }
@@ -120,6 +121,11 @@ static const NSInteger GameObjectMovingAnimTag = 9999;
 {
     [self stopActionByTag:GameObjectMovingAnimTag];
     [self setFacingDirection:self.facingDirection forceReset:YES];
+}
+
+- (NSString *)identifier
+{
+    return nil;
 }
 
 @end

@@ -17,6 +17,7 @@ typedef enum { kProjectileNormal, kProjectileDoubleDamage } ProjectileType;
 
 @property (nonatomic, readonly, assign) ProjectileType projectileType;
 @property (nonatomic, readonly, assign) Direction direction;
+@property (nonatomic, strong) NSString *identifier;
 
 + (CCSpriteBatchNode *)spriteBatchNode;
 

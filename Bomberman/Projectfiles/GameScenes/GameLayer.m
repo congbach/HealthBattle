@@ -75,25 +75,28 @@ static const CGFloat ProjectileVelocity = 2.0f;
 
 @interface GameObjectState : NSObject<NSCoding>
 
+@property (nonatomic, strong) NSString *identifier;
 @property (nonatomic, assign) CGPoint position;
 @property (nonatomic, assign) CGPoint velocity;
 @property (nonatomic, assign) Direction direction;
 
-- (id)initWithPosition:(CGPoint)position velocity:(CGPoint)velocity direction:(Direction)direction;
+- (id)initWithIdentifier:(NSString *)identifier position:(CGPoint)position velocity:(CGPoint)velocity direction:(Direction)direction;
 
 @end
 
 @implementation GameObjectState
 
+@synthesize identifier = _identifier;
 @synthesize position = _position;
 @synthesize velocity = _velocity;
 @synthesize direction = _direction;
 
 
-- (id)initWithPosition:(CGPoint)position velocity:(CGPoint)velocity direction:(Direction)direction
+- (id)initWithIdentifier:(NSString *)identifier position:(CGPoint)position velocity:(CGPoint)velocity direction:(Direction)direction;
 {
     if (self = [super init])
     {
+        self.identifier = identifier;
         self.position = position;
         self.velocity = velocity;
         self.direction = direction;
@@ -105,6 +108,7 @@ static const CGFloat ProjectileVelocity = 2.0f;
 {
     if (self = [super init])
     {
+        self.identifier = [decoder decodeObjectForKey:@"identifier"];
         self.position = [decoder decodeCGPointForKey:@"position"];
         self.velocity = [decoder decodeCGPointForKey:@"velocity"];
         self.direction = (Direction)[decoder decodeIntForKey:@"direction"];
@@ -114,6 +118,7 @@ static const CGFloat ProjectileVelocity = 2.0f;
 
 - (void)encodeWithCoder:(NSCoder *)encoder
 {
+    [encoder encodeObject:self.identifier forKey:@"identifier"];
     [encoder encodeCGPoint:self.position forKey:@"position"];
     [encoder encodeCGPoint:self.velocity forKey:@"velocity"];
     [encoder encodeInt:self.direction forKey:@"direction"];
@@ -124,7 +129,9 @@ static const CGFloat ProjectileVelocity = 2.0f;
 @interface GameState : NSObject<NSCoding>
 
 @property (nonatomic, strong) GameObjectState *serverBombermanState;
+@property (nonatomic, strong) NSArray *serverProjectilesStates;
 @property (nonatomic, strong) GameObjectState *clientBombermanState;
+@property (nonatomic, strong) NSArray *clientProjectilesStates;
 
 @end
 
@@ -132,14 +139,18 @@ static const CGFloat ProjectileVelocity = 2.0f;
 @implementation GameState
 
 @synthesize serverBombermanState = _serverBombermanState;
+@synthesize serverProjectilesStates = _serverProjectilesStates;
 @synthesize clientBombermanState = _clientBombermanState;
+@synthesize clientProjectilesStates = _clientProjectilesStates;
 
 - (id)initWithCoder:(NSCoder *)decoder
 {
     if (self = [super init])
     {
         self.serverBombermanState = [decoder decodeObjectForKey:@"serverBombermanState"];
+        self.serverProjectilesStates = [decoder decodeObjectForKey:@"serverProjectilesStates"];
         self.clientBombermanState = [decoder decodeObjectForKey:@"clientBombermanState"];
+        self.clientProjectilesStates = [decoder decodeObjectForKey:@"clientProjectilesStates"];
     }
     return self;
 }
@@ -147,7 +158,9 @@ static const CGFloat ProjectileVelocity = 2.0f;
 - (void)encodeWithCoder:(NSCoder *)encoder
 {
     [encoder encodeObject:self.serverBombermanState forKey:@"serverBombermanState"];
+    [encoder encodeObject:self.serverProjectilesStates forKey:@"serverProjectilesStates"];
     [encoder encodeObject:self.clientBombermanState forKey:@"clientBombermanState"];
+    [encoder encodeObject:self.clientProjectilesStates forKey:@"clientProjectilesStates"];
 }
 
 @end
@@ -187,6 +200,7 @@ static const CGFloat ProjectileVelocity = 2.0f;
 - (BOOL)moveGameObject:(GameObject *)gameObject direction:(Direction)direction isPlayer:(BOOL)isPlayer;
 - (BOOL)addBombAtTileCoord:(CGPoint)tileCoord;
 - (BOOL)shootProjectileFromGameObject:(GameObject *)gameObject direction:(Direction)direction;
+- (Projectile *)createProjectileAtPosition:(CGPoint)position identifier:(NSString *)identifier owner:(GameObject *)gameObject direction:(Direction)direction;
 
 - (CGPoint)tileCoordForPosition:(CGPoint)position;
 - (CGPoint)unitVelocityWithDirection:(Direction)direction;
@@ -208,7 +222,7 @@ static const CGFloat ProjectileVelocity = 2.0f;
 @synthesize bombs = _bombs;
 @synthesize allies = _allies;
 @synthesize enemies = _enemies;
-@synthesize alliesProjectiles = alliesProjectiles;
+@synthesize alliesProjectiles = _alliesProjectiles;
 @synthesize enemiesProjectiles = _enemiesProjectiles;
 @synthesize clientPlayerAction = _clientPlayerAction;
 @synthesize serverGameState = _serverGameState;
@@ -244,6 +258,8 @@ static const CGFloat ProjectileVelocity = 2.0f;
 {
     if (self.gkSession.sessionMode == GKSessionModeServer)
     {
+        GameState *gameState = [[GameState alloc] init];
+        
         Direction joystickDirection = self.sneakyInputLayer.joystickDirection;
         if (joystickDirection != kNoDirection)
             [self.bomberman playMovingAnimWithDirection:joystickDirection];
@@ -251,6 +267,7 @@ static const CGFloat ProjectileVelocity = 2.0f;
             [self.bomberman stopMovingAnim];
         
         [self moveGameObject:self.bomberman direction:joystickDirection isPlayer:YES];
+        gameState.serverBombermanState = [[GameObjectState alloc] initWithIdentifier:nil position:self.bomberman.position velocity:CGPointZero direction:joystickDirection];
         
         if (self.sneakyInputLayer.padButtonActive)
             //[self addBombAtTileCoord:[self tileCoordForPosition:self.bomberman.position]];
@@ -272,6 +289,8 @@ static const CGFloat ProjectileVelocity = 2.0f;
                 [self shootProjectileFromGameObject:self.enemyBomberman direction:self.enemyBomberman.facingDirection];
                 self.clientPlayerAction.padButtonActive = NO;
             }
+            
+            gameState.clientBombermanState = [[GameObjectState alloc] initWithIdentifier:nil position:self.enemyBomberman.position velocity:CGPointZero direction:joystickDirection];
         }
         
         
@@ -292,7 +311,15 @@ static const CGFloat ProjectileVelocity = 2.0f;
             [toBeDestroyedProjectiles removeLastObject];
         }
         
+        NSMutableArray *serverProjectilesStates = [NSMutableArray arrayWithCapacity:self.alliesProjectiles.count];
         for (Projectile *projectile in self.alliesProjectiles)
+        {
+            GameObjectState *projectileState = [[GameObjectState alloc] initWithIdentifier:projectile.identifier position:projectile.position velocity:CGPointZero direction:projectile.direction];
+            [serverProjectilesStates addObject:projectileState];
+        }
+        gameState.serverProjectilesStates = [NSArray arrayWithArray:serverProjectilesStates];
+        
+        for (Projectile *projectile in self.enemiesProjectiles)
         {
             CGPoint unitVelocity = [self unitVelocityWithDirection:projectile.direction];
             CGPoint tileCoord = [self tileCoordForPosition:projectile.position];
@@ -308,11 +335,15 @@ static const CGFloat ProjectileVelocity = 2.0f;
             [toBeDestroyedProjectiles removeLastObject];
         }
         
-        // Send updates to clients
-        GameState *gameState = [[GameState alloc] init];
-        gameState.serverBombermanState = [[GameObjectState alloc] initWithPosition:self.bomberman.position velocity:CGPointZero direction:self.sneakyInputLayer.joystickDirection];
-        gameState.clientBombermanState = [[GameObjectState alloc] initWithPosition:self.enemyBomberman.position velocity:CGPointZero direction:self.clientPlayerAction.joystickDirection];
+        NSMutableArray *clientProjectilesStates = [NSMutableArray arrayWithCapacity:self.enemiesProjectiles.count];
+        for (Projectile *projectile in self.enemiesProjectiles)
+        {
+            GameObjectState *projectileState = [[GameObjectState alloc] initWithIdentifier:projectile.identifier position:projectile.position velocity:CGPointZero direction:projectile.direction];
+            [clientProjectilesStates addObject:projectileState];
+        }
+        gameState.clientProjectilesStates = [NSArray arrayWithArray:clientProjectilesStates];
         
+        // Send updates to clients
         [self broadcastDataToClients:[NSKeyedArchiver archivedDataWithRootObject:gameState]];
     }
     else
@@ -344,6 +375,56 @@ static const CGFloat ProjectileVelocity = 2.0f;
                 [self.enemyBomberman stopMovingAnim];
             [self moveGameObject:self.enemyBomberman direction:joystickDirection isPlayer:YES];
             self.enemyBomberman.position = self.serverGameState.serverBombermanState.position;
+            
+            NSArray *alliesProjectilesStates = self.serverGameState.clientProjectilesStates;
+            NSMutableDictionary *oldAlliesProjectiles = [NSMutableDictionary dictionaryWithCapacity:self.alliesProjectiles.count];
+            for (Projectile *projectile in self.alliesProjectiles)
+                [oldAlliesProjectiles setObject:projectile forKey:projectile.identifier];
+            [self.alliesProjectiles removeAllObjects];
+            
+            for (GameObjectState *allyProjectileState in alliesProjectilesStates)
+            {
+                Projectile *projectile = [oldAlliesProjectiles objectForKey:allyProjectileState.identifier];
+                
+                if (! projectile)
+                    projectile = [self createProjectileAtPosition:allyProjectileState.position identifier:allyProjectileState.identifier owner:self.bomberman direction:allyProjectileState.direction];
+                else
+                {
+                    [oldAlliesProjectiles removeObjectForKey:allyProjectileState.identifier];   
+                    projectile.position = allyProjectileState.position;
+                }
+                
+                [self.alliesProjectiles addObject:projectile];
+            }
+            
+            for (Projectile *projectile in [oldAlliesProjectiles allValues])
+                [self.projectileBatchNode removeChild:projectile cleanup:YES];
+            
+            
+            NSArray *enemiesProjectilesStates = self.serverGameState.serverProjectilesStates;
+            NSMutableDictionary *oldEnemiesProjectiles = [NSMutableDictionary dictionaryWithCapacity:self.enemiesProjectiles.count];
+            for (Projectile *projectile in self.enemiesProjectiles)
+                [oldEnemiesProjectiles setObject:projectile forKey:projectile.identifier];
+            [self.enemiesProjectiles removeAllObjects];
+            
+            for (GameObjectState *enemyProjectileState in enemiesProjectilesStates)
+            {
+                Projectile *projectile = [oldEnemiesProjectiles objectForKey:enemyProjectileState.identifier];
+                
+                if (! projectile)
+                    projectile = [self createProjectileAtPosition:enemyProjectileState.position identifier:enemyProjectileState.identifier owner:self.bomberman direction:enemyProjectileState.direction];
+                else
+                {
+                    [oldEnemiesProjectiles removeObjectForKey:enemyProjectileState.identifier];   
+                    projectile.position = enemyProjectileState.position;
+                }
+                
+                [self.enemiesProjectiles addObject:projectile];
+            }
+            
+            for (Projectile *projectile in [oldEnemiesProjectiles allValues])
+                [self.projectileBatchNode removeChild:projectile cleanup:YES];
+            
             
             self.serverGameState = nil;
         }
@@ -506,6 +587,16 @@ static const CGFloat ProjectileVelocity = 2.0f;
     [self.bombs setObject:bomb forKey:bombKey];
     
     return YES;
+}
+
+- (Projectile *)createProjectileAtPosition:(CGPoint)position identifier:(NSString *)identifier owner:(GameObject *)gameObject direction:(Direction)direction
+{
+    Projectile *projectile = [[Projectile alloc] initWithType:kProjectileNormal direction:direction];
+    projectile.identifier = identifier;
+    projectile.position = position;
+    [self.projectileBatchNode addChild:projectile];
+    
+    return projectile;
 }
 
 - (BOOL)shootProjectileFromGameObject:(GameObject *)gameObject direction:(Direction)direction
