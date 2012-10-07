@@ -305,13 +305,10 @@ static const CGFloat ProjectileVelocity = 2.0f;
 
 - (BOOL)shootProjectileFromGameObject:(GameObject *)gameObject direction:(Direction)direction
 {
-    Projectile *projectile = [[Projectile alloc] initWithType:kProjectileNormal direction:direction];
-    
     CGPoint unitVelocity = [self unitVelocityWithDirection:direction];
     
-    CGPoint tileCoord = [self tileCoordForPosition:gameObject.position];
-    CGPoint nextTileCoord = CGPointMake(tileCoord.x + unitVelocity.x, tileCoord.y - unitVelocity.y);
-    projectile.position = [self positionForTileCoord:nextTileCoord];
+    Projectile *projectile = [[Projectile alloc] initWithType:kProjectileNormal direction:direction];
+    projectile.position = gameObject.position;
     [self.projectileBatchNode addChild:projectile];
     
     if (gameObject.side == kGameObjectSideAlly)
