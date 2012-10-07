@@ -18,7 +18,7 @@ static const int BackgroundZOrder = 0;
 static const int TileMapZOrder = 1;
 static const int BatchNodeZOrder = 2;
 static const int OverlayZOrder = 3;
-static const CGFloat GameObjectMovingVelocity = 1.0f;
+static const CGFloat GameObjectMovingVelocity = 2.0f;
 static NSString * const DemoMap = @"Demo.tmx";
 static NSString * const TileMapBackgroundLayerName = @"Background";
 static NSString * const TileMapPowerUpsLayerName = @"PowerUps";
@@ -27,7 +27,48 @@ static const CGFloat ProjectileVelocity = 2.0f;
 
 
 typedef enum { kNotGameOver, kServerWin, kClientWin } GameOverState;
+typedef enum { kNetworkPrompting, kNetworkConnecting, kNetworkConnected, kNetworkDisconnected } NetworkState;
+typedef enum { kGameReady, kGameStart } GameActionType;
 
+#pragma mark - GameAction
+
+@interface GameAction : NSObject<NSCoding>
+
+@property (nonatomic, readwrite, assign) GameActionType gameActionType;
+
+- (id)initWithGameActionType:(GameActionType)gameActionType;
+
+@end
+
+
+@implementation GameAction
+
+@synthesize gameActionType = _gameActionType;
+
+- (id)initWithGameActionType:(GameActionType)gameActionType
+{
+    if (self = [super init])
+    {
+        self.gameActionType = gameActionType;
+    }
+    return self;
+}
+
+- (id)initWithCoder:(NSCoder *)decoder
+{
+    if (self = [super init])
+    {
+        self.gameActionType = (GameActionType) [decoder decodeIntForKey:@"gameActionType"];
+    }
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)encoder
+{
+    [encoder encodeInt:(int)self.gameActionType forKey:@"gameActionType"];
+}
+
+@end
 
 #pragma mark - PlayerAction
 
@@ -218,7 +259,14 @@ typedef enum { kNotGameOver, kServerWin, kClientWin } GameOverState;
 @property (nonatomic, strong) GameState *serverGameState;
 @property (nonatomic, assign) Direction lastJoystickDirection;
 
+@property (nonatomic, strong) UIAlertView *alertView;
+@property (nonatomic, assign) NetworkState networkState;
+@property (nonatomic, assign) BOOL serverReady;
+@property (nonatomic, assign) BOOL clientReady;
 
+
+- (void)startNewGame;
+- (void)promptGKSession;
 - (void)preloadResources;
 - (void)loadTileMap;
 - (void)loadBatchNodes;
@@ -257,13 +305,18 @@ typedef enum { kNotGameOver, kServerWin, kClientWin } GameOverState;
 @synthesize serverGameState = _serverGameState;
 @synthesize lastJoystickDirection = _lastJoystickDirection;
 
+@synthesize alertView = _alertView;
+@synthesize networkState = _networkState;
+@synthesize serverReady = _serverReady;
+@synthesize clientReady = _clientReady;
+
 -(id) init
 {
 	self = [super init];
 	if (self)
 	{
-        UIAlertView *alerView = [[UIAlertView alloc] initWithTitle:@"Network" message:@"Please choose an option" delegate:self cancelButtonTitle:@"Host" otherButtonTitles:@"Join", nil];
-        [alerView show];
+        [self preloadResources];
+        [self promptGKSession];
 	}
 	return self;
 }
@@ -386,24 +439,34 @@ typedef enum { kNotGameOver, kServerWin, kClientWin } GameOverState;
             [toBeDestroyedEnemiesProjectiles removeLastObject];
         }
         
+//        BOOL enemyHit = NO;
         for (Projectile *allyProjectile in self.alliesProjectiles)
             if (CGRectIntersectsRect(allyProjectile.boundingBox, self.enemyBomberman.boundingBox))
             {
                 if (! [toBeDestroyedAlliesProjectiles containsObject:allyProjectile])
                 {
+//                    enemyHit = YES;
                     [toBeDestroyedAlliesProjectiles addObject:allyProjectile];
                     self.enemyBomberman.hp--;
                 }
             }
+//        if (enemyHit)
+//            self.enemyBomberman.hp++;
+        
+//        BOOL allyHit = NO;
         for (Projectile *enemyProjectile in self.enemiesProjectiles)
             if (CGRectIntersectsRect(enemyProjectile.boundingBox, self.bomberman.boundingBox))
             {
                 if (! [toBeDestroyedEnemiesProjectiles containsObject:enemyProjectile])
                 {
+//                    allyHit = YES;
                     [toBeDestroyedEnemiesProjectiles addObject:enemyProjectile];
                     self.bomberman.hp--;
                 }
             }
+//        if (allyHit)
+//            self.bomberman.hp++;
+        
         [self.alliesProjectiles removeObjectsInArray:toBeDestroyedAlliesProjectiles];
         while (toBeDestroyedAlliesProjectiles.count)
         {
@@ -774,8 +837,38 @@ typedef enum { kNotGameOver, kServerWin, kClientWin } GameOverState;
     return unitVelocity;
 }
 
+- (void)promptGKSession
+{
+    self.networkState = kNetworkPrompting;
+    self.alertView = [[UIAlertView alloc] initWithTitle:@"Network" message:@"Please choose an option" delegate:self cancelButtonTitle:@"Host" otherButtonTitles:@"Join", nil];
+    [self.alertView show];
+}
 
-#pragma mark TileMapManimupation
+- (void)startNewGame
+{   
+    [self loadTileMap];
+    [self createSneakyInputLayer];
+    [self loadBatchNodes];
+    [self createBomberman];
+    
+    self.bombs = [NSMutableDictionary dictionary];
+    self.allies = [NSMutableArray array];
+    self.enemies = [NSMutableArray array];
+    self.alliesProjectiles = [NSMutableArray array];
+    self.enemiesProjectiles = [NSMutableArray array];
+    self.lastJoystickDirection = kNoDirection;
+    
+    {
+        CCSprite *background = [CCSprite spriteWithFile:@"background.png"];
+        background.position = CGPointMake(240, 160);
+        [self addChild:background];
+    }
+    
+    [self scheduleUpdate];
+}
+
+
+#pragma mark - TileMapManimupation
 
 - (CGRect)tileBoundingBoxAtTileCoord:(CGPoint)tileCoord
 {
@@ -817,6 +910,8 @@ typedef enum { kNotGameOver, kServerWin, kClientWin } GameOverState;
 {
     switch (state) {
         case GKPeerStateAvailable:
+            if (self.alertView)
+                self.alertView.message = [NSString stringWithFormat:@"Found %@. Establishing a connection", peerID];
 			NSLog(@"didChangeState: peer %@ available", [session displayNameForPeer:peerID]);
             
             if (session.sessionMode == GKSessionModeClient)
@@ -826,40 +921,33 @@ typedef enum { kNotGameOver, kServerWin, kClientWin } GameOverState;
         case GKPeerStateConnected:
 			NSLog(@"didChangeState: peer %@ connected", [session displayNameForPeer:peerID]);
             
-            [session setDataReceiveHandler:self withContext:nil];
-            
-            [self preloadResources];
-            [self loadTileMap];
-            [self createSneakyInputLayer];
-            [self loadBatchNodes];
-            [self createBomberman];
-            
-            self.bombs = [NSMutableDictionary dictionary];
-            self.allies = [NSMutableArray array];
-            self.enemies = [NSMutableArray array];
-            self.alliesProjectiles = [NSMutableArray array];
-            self.enemiesProjectiles = [NSMutableArray array];
-            self.lastJoystickDirection = kNoDirection;
-            
+            if (self.alertView)
             {
-                CCSprite *background = [CCSprite spriteWithFile:@"background.png"];
-                background.position = CGPointMake(240, 160);
-                [self addChild:background];
+                self.networkState = kNetworkConnected;
+                self.alertView.message = @"Connected to %@";
+                [self.alertView dismissWithClickedButtonIndex:0 animated:NO];
             }
             
-            [self scheduleUpdate];
+            [session setDataReceiveHandler:self withContext:nil];
+            [self startNewGame];
             break;
             
         case GKPeerStateDisconnected:
 			NSLog(@"didChangeState: peer %@ disconnected", [session displayNameForPeer:peerID]);
+            if (self.alertView)
+                self.alertView.message = [NSString stringWithFormat:@"%@ disconnected.", peerID];
             break;
             
         case GKPeerStateUnavailable:
 			NSLog(@"didChangeState: peer %@ unavailable", [session displayNameForPeer:peerID]);
+            if (self.alertView)
+                self.alertView.message = [NSString stringWithFormat:@"%@ unavailable.", peerID];
             break;
             
         case GKPeerStateConnecting:
 			NSLog(@"didChangeState: peer %@ connecting", [session displayNameForPeer:peerID]);
+            if (self.alertView)
+                self.alertView.message = [NSString stringWithFormat:@"%@ connecting.", peerID];
             break;
             
         default:
@@ -871,16 +959,25 @@ typedef enum { kNotGameOver, kServerWin, kClientWin } GameOverState;
 {
 	NSLog(@"didReceiveConnectionRequestFromPeer: %@", [session displayNameForPeer:peerID]);
     
+    if (self.alertView)
+        self.alertView.message = [NSString stringWithFormat:@"Found %@. Establishing a connection", peerID];
+    
     [session acceptConnectionFromPeer:peerID error:nil];
 }
 
 - (void)session:(GKSession *)session connectionWithPeerFailed:(NSString *)peerID withError:(NSError *)error
 {
+    if (self.alertView)
+        self.alertView.message = [NSString stringWithFormat:@"Failed to connect to %@. Establishing a connection", peerID];
+    
 	NSLog(@"connectionWithPeerFailed: peer: %@, error: %@", [session displayNameForPeer:peerID], error);    
 }
 
 - (void)session:(GKSession *)session didFailWithError:(NSError *)error
 {
+    if (self.alertView)
+        self.alertView.message = @"Connection failed. Establishing a connection";
+    
 	NSLog(@"didFailWithError: error: %@", error);
 }
 
@@ -901,13 +998,38 @@ typedef enum { kNotGameOver, kServerWin, kClientWin } GameOverState;
 
 - (void)receiveData:(NSData *)data fromPeer:(NSString *)peer inSession:(GKSession *)session context:(void *)context
 {
+    id decodedData = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+    
     if (self.gkSession.sessionMode == GKSessionModeServer)
     {
-        self.clientPlayerAction = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+        if ([decodedData isKindOfClass:[PlayerAction class]])
+            self.clientPlayerAction = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+        else if ([decodedData isKindOfClass:[GameAction class]])
+        {
+            GameAction *gameAction = (GameAction *) decodedData;
+            if (gameAction.gameActionType == kGameReady)
+            {
+                self.clientReady = YES;
+                if (self.serverReady)
+                {
+                    [self broadcastDataToClients:[NSKeyedArchiver archivedDataWithRootObject:[[GameAction alloc] initWithGameActionType:kGameStart]]];
+                    [self startNewGame];
+                }
+            }
+        }
     }
     else
     {
-        self.serverGameState = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+        if ([decodedData isKindOfClass:[GameState class]])
+            self.serverGameState = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+        else if ([decodedData isKindOfClass:[GameAction class]])
+        {
+            GameAction *gameAction = (GameAction *) decodedData;
+            if (gameAction.gameActionType == kGameStart)
+            {
+                [self startNewGame];
+            }
+        }
     }
 }
 
@@ -923,10 +1045,64 @@ typedef enum { kNotGameOver, kServerWin, kClientWin } GameOverState;
 //    
 //    [gkPeerPicker show];
     
-    GKSessionMode sessionMode = buttonIndex ? GKSessionModeClient : GKSessionModeServer;
-    self.gkSession = [[GKSession alloc] initWithSessionID:GKSessionID displayName:GKSessionID sessionMode:sessionMode];
-    self.gkSession.delegate = self;
-    self.gkSession.available = YES;
+    switch (self.networkState) {
+        case kNetworkPrompting:
+        {   
+            self.networkState = kNetworkConnecting;
+            GKSessionMode sessionMode = buttonIndex ? GKSessionModeClient : GKSessionModeServer;
+            self.gkSession = [[GKSession alloc] initWithSessionID:GKSessionID displayName:GKSessionID sessionMode:sessionMode];
+            self.gkSession.delegate = self;
+            self.gkSession.available = YES;
+            
+            self.alertView = [[UIAlertView alloc] initWithTitle:@"Network" message:(sessionMode == GKSessionModeServer ? @"Waiting for connection..." : @"Connecting...") delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:nil];
+            [self.alertView show];
+        }
+            break;
+            
+        case kNetworkConnecting:
+        {
+            self.gkSession.available = NO;
+            self.gkSession.delegate = nil;
+            self.gkSession = nil;
+            
+            [self promptGKSession];
+        }
+            break;
+            
+        case kNetworkConnected:
+        {
+//            if (buttonIndex == self.alertView.cancelButtonIndex)
+//            {
+//                self.gkSession.available = NO;
+//                self.gkSession.delegate = nil;
+//                self.gkSession = nil;
+//                
+//                [self promptGKSession];
+//            }
+//            else
+//            {
+//                if (self.gkSession.sessionMode == GKSessionModeClient)
+//                {
+//                    self.clientReady = YES;
+//                    [self sendDataToServer:[NSKeyedArchiver archivedDataWithRootObject:[[GameAction alloc] initWithGameActionType:kGameReady]]];
+//                }
+//                else
+//                {
+//                    self.serverReady = YES;
+//                    if (self.clientReady)
+//                    {
+//                        [self broadcastDataToClients:[NSKeyedArchiver archivedDataWithRootObject:[[GameAction alloc] initWithGameActionType:kGameStart]]];
+//                        [self startNewGame];
+//                    }
+//                }
+//            }
+//            [self startNewGame];
+        }
+            break;
+            
+        case kNetworkDisconnected:
+            break;
+    }
 }
 
 @end
