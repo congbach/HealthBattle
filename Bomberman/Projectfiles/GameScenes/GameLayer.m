@@ -71,6 +71,88 @@ static const CGFloat ProjectileVelocity = 2.0f;
 @end
 
 
+#pragma mark - GameState
+
+@interface GameObjectState : NSObject<NSCoding>
+
+@property (nonatomic, assign) CGPoint position;
+@property (nonatomic, assign) CGPoint velocity;
+@property (nonatomic, assign) Direction direction;
+
+- (id)initWithPosition:(CGPoint)position velocity:(CGPoint)velocity direction:(Direction)direction;
+
+@end
+
+@implementation GameObjectState
+
+@synthesize position = _position;
+@synthesize velocity = _velocity;
+@synthesize direction = _direction;
+
+
+- (id)initWithPosition:(CGPoint)position velocity:(CGPoint)velocity direction:(Direction)direction
+{
+    if (self = [super init])
+    {
+        self.position = position;
+        self.velocity = velocity;
+        self.direction = direction;
+    }
+    return self;
+}
+
+- (id)initWithCoder:(NSCoder *)decoder
+{
+    if (self = [super init])
+    {
+        self.position = [decoder decodeCGPointForKey:@"position"];
+        self.velocity = [decoder decodeCGPointForKey:@"velocity"];
+        self.direction = (Direction)[decoder decodeIntForKey:@"direction"];
+    }
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)encoder
+{
+    [encoder encodeCGPoint:self.position forKey:@"position"];
+    [encoder encodeCGPoint:self.velocity forKey:@"velocity"];
+    [encoder encodeInt:self.direction forKey:@"direction"];
+}
+
+@end
+
+@interface GameState : NSObject<NSCoding>
+
+@property (nonatomic, strong) GameObjectState *serverBombermanState;
+@property (nonatomic, strong) GameObjectState *clientBombermanState;
+
+@end
+
+
+@implementation GameState
+
+@synthesize serverBombermanState = _serverBombermanState;
+@synthesize clientBombermanState = _clientBombermanState;
+
+- (id)initWithCoder:(NSCoder *)decoder
+{
+    if (self = [super init])
+    {
+        self.serverBombermanState = [decoder decodeObjectForKey:@"serverBombermanState"];
+        self.clientBombermanState = [decoder decodeObjectForKey:@"clientBombermanState"];
+    }
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)encoder
+{
+    [encoder encodeObject:self.serverBombermanState forKey:@"serverBombermanState"];
+    [encoder encodeObject:self.clientBombermanState forKey:@"clientBombermanState"];
+}
+
+@end
+
+
 #pragma mark - GameLayer
 
 @interface GameLayer () <GKPeerPickerControllerDelegate, GKSessionDelegate, UIAlertViewDelegate>
@@ -91,6 +173,7 @@ static const CGFloat ProjectileVelocity = 2.0f;
 @property (nonatomic, strong) NSMutableArray *alliesProjectiles;
 @property (nonatomic, strong) NSMutableArray *enemiesProjectiles;
 @property (nonatomic, strong) PlayerAction *clientPlayerAction;
+@property (nonatomic, strong) GameState *serverGameState;
 @property (nonatomic, assign) Direction lastJoystickDirection;
 
 
@@ -128,6 +211,7 @@ static const CGFloat ProjectileVelocity = 2.0f;
 @synthesize alliesProjectiles = alliesProjectiles;
 @synthesize enemiesProjectiles = _enemiesProjectiles;
 @synthesize clientPlayerAction = _clientPlayerAction;
+@synthesize serverGameState = _serverGameState;
 @synthesize lastJoystickDirection = _lastJoystickDirection;
 
 -(id) init
@@ -184,8 +268,8 @@ static const CGFloat ProjectileVelocity = 2.0f;
             
             if (self.clientPlayerAction.padButtonActive)
             {
-                //[self addBombAtTileCoord:[self tileCoordForPosition:self.bomberman.position]];
-                [self shootProjectileFromGameObject:self.bomberman direction:self.bomberman.facingDirection];
+                //[self addBombAtTileCoord:[self tileCoordForPosition:self.enemyBomberman.position]];
+                [self shootProjectileFromGameObject:self.enemyBomberman direction:self.enemyBomberman.facingDirection];
                 self.clientPlayerAction.padButtonActive = NO;
             }
         }
@@ -223,9 +307,17 @@ static const CGFloat ProjectileVelocity = 2.0f;
             [self.projectileBatchNode removeChild:[toBeDestroyedProjectiles lastObject] cleanup:YES];
             [toBeDestroyedProjectiles removeLastObject];
         }
+        
+        // Send updates to clients
+        GameState *gameState = [[GameState alloc] init];
+        gameState.serverBombermanState = [[GameObjectState alloc] initWithPosition:self.bomberman.position velocity:CGPointZero direction:self.sneakyInputLayer.joystickDirection];
+        gameState.clientBombermanState = [[GameObjectState alloc] initWithPosition:self.enemyBomberman.position velocity:CGPointZero direction:self.clientPlayerAction.joystickDirection];
+        
+        [self broadcastDataToClients:[NSKeyedArchiver archivedDataWithRootObject:gameState]];
     }
     else
     {
+        // Send user inputs to server to process
         Direction joystickDirection = self.sneakyInputLayer.joystickDirection;
         if (joystickDirection != self.lastJoystickDirection || self.sneakyInputLayer.padButtonActive)
         {
@@ -233,6 +325,28 @@ static const CGFloat ProjectileVelocity = 2.0f;
             [self sendDataToServer:[NSKeyedArchiver archivedDataWithRootObject:playAction]];
         }
         self.lastJoystickDirection = joystickDirection;
+        
+        // Update according to server
+        if (self.serverGameState)
+        {
+            joystickDirection = self.serverGameState.clientBombermanState.direction;
+            if (joystickDirection != kNoDirection)
+                [self.bomberman playMovingAnimWithDirection:joystickDirection];
+            else
+                [self.bomberman stopMovingAnim];
+            [self moveGameObject:self.bomberman direction:joystickDirection isPlayer:YES];
+            self.bomberman.position = self.serverGameState.clientBombermanState.position;
+            
+            joystickDirection = self.serverGameState.serverBombermanState.direction;
+            if (joystickDirection != kNoDirection)
+                [self.enemyBomberman playMovingAnimWithDirection:joystickDirection];
+            else
+                [self.enemyBomberman stopMovingAnim];
+            [self moveGameObject:self.enemyBomberman direction:joystickDirection isPlayer:YES];
+            self.enemyBomberman.position = self.serverGameState.serverBombermanState.position;
+            
+            self.serverGameState = nil;
+        }
     }
 }
 
@@ -557,7 +671,8 @@ static const CGFloat ProjectileVelocity = 2.0f;
 
 - (void)broadcastDataToClients:(NSData *)data
 {
-    
+    if (self.gkSession && self.gkSession.sessionMode == GKSessionModeServer)
+        [self.gkSession sendDataToAllPeers:data withDataMode:GKSendDataReliable error:nil];
 }
 
 - (void)receiveData:(NSData *)data fromPeer:(NSString *)peer inSession:(GKSession *)session context:(void *)context
@@ -568,7 +683,7 @@ static const CGFloat ProjectileVelocity = 2.0f;
     }
     else
     {
-        
+        self.serverGameState = [NSKeyedUnarchiver unarchiveObjectWithData:data];
     }
 }
 
