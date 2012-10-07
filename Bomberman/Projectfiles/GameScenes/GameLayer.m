@@ -292,6 +292,8 @@ static const CGFloat ProjectileVelocity = 2.0f;
             
             gameState.clientBombermanState = [[GameObjectState alloc] initWithIdentifier:nil position:self.enemyBomberman.position velocity:CGPointZero direction:joystickDirection];
         }
+        else
+            gameState.clientBombermanState = [[GameObjectState alloc] initWithIdentifier:nil position:self.enemyBomberman.position velocity:CGPointZero direction:kNoDirection];
         
         
         NSMutableArray *toBeDestroyedProjectiles = [NSMutableArray array];
