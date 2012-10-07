@@ -36,6 +36,7 @@ static const CGFloat ProjectileVelocity = 2.0f;
 @property (nonatomic, strong) CCSpriteBatchNode *bombBatchNode;
 @property (nonatomic, strong) CCSpriteBatchNode *projectileBatchNode;
 @property (nonatomic, strong) Bomberman *bomberman;
+@property (nonatomic, strong) Bomberman *enemyBomberman;
 @property (nonatomic, strong) NSMutableDictionary *bombs;
 @property (nonatomic, strong) NSMutableArray *allies;
 @property (nonatomic, strong) NSMutableArray *enemies;
@@ -70,6 +71,7 @@ static const CGFloat ProjectileVelocity = 2.0f;
 @synthesize bombBatchNode = _bombBatchNode;
 @synthesize projectileBatchNode = _projectileBatchNode;
 @synthesize bomberman = _bomberman;
+@synthesize enemyBomberman = _enemyBomberman;
 @synthesize bombs = _bombs;
 @synthesize allies = _allies;
 @synthesize enemies = _enemies;
@@ -159,12 +161,25 @@ static const CGFloat ProjectileVelocity = 2.0f;
     CGSize mapSize = self.tileMap.mapSize;
     CGSize tileSize = self.tileMap.tileSize;
     
-    CGPoint startingCoordinate = CGPointMake(1, mapSize.height - 2);
+    CGPoint startingCoordinate;
+    
+    if (self.gkSession.sessionMode == GKSessionModeServer)
+        startingCoordinate = CGPointMake(1, mapSize.height - 2);
+    else
+        startingCoordinate = CGPointMake(mapSize.width - 2, 1);
     
     [self.bomberman setPosition:CGPointMake((startingCoordinate.x + 0.5f) * tileSize.width,
                                             (startingCoordinate.y + 0.5f) * tileSize.height)];
     
+    self.enemyBomberman = [[Bomberman alloc] initWithSide:kGameObjectSideEnemy];
+    [self addGameObject:self.enemyBomberman];
+    if (self.gkSession.sessionMode != GKSessionModeServer)
+        startingCoordinate = CGPointMake(1, mapSize.height - 2);
+    else
+        startingCoordinate = CGPointMake(mapSize.width - 2, 1);
     
+    [self.enemyBomberman setPosition:CGPointMake((startingCoordinate.x + 0.5f) * tileSize.width,
+                                                 (startingCoordinate.y + 0.5f) * tileSize.height)];
 }
 
 - (void)createSneakyInputLayer
@@ -274,7 +289,7 @@ static const CGFloat ProjectileVelocity = 2.0f;
 - (void)addGameObject:(GameObject *)gameObject
 {
     if ([gameObject isKindOfClass:[Bomberman class]])
-        [self.bombermanBatchNode addChild:self.bomberman];
+        [self.bombermanBatchNode addChild:gameObject];
     
     if (gameObject.side == kGameObjectSideAlly)
         [self.allies addObject:gameObject];
@@ -396,6 +411,8 @@ static const CGFloat ProjectileVelocity = 2.0f;
         case GKPeerStateConnected:
 			NSLog(@"didChangeState: peer %@ connected", [session displayNameForPeer:peerID]);
             
+            [session setDataReceiveHandler:self withContext:nil];
+            
             [self preloadResources];
             [self loadTileMap];
             [self createSneakyInputLayer];
@@ -443,6 +460,24 @@ static const CGFloat ProjectileVelocity = 2.0f;
 - (void)session:(GKSession *)session didFailWithError:(NSError *)error
 {
 	NSLog(@"didFailWithError: error: %@", error);
+}
+
+
+#pragma - GKSession Send/Receive data
+
+- (void)sendDataToServer:(NSData *)data
+{
+    
+}
+
+- (void)broadcastDataToClients:(NSData *)data
+{
+    
+}
+
+- (void)receiveData:(NSData *)data fromPeer:(NSString *)peer inSession:(GKSession *)session context:(void *)context
+{
+    
 }
 
 
