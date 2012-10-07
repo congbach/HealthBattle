@@ -8,11 +8,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Bomberman/Projectfiles/GameScenes/GameLayer.m"
-         timestampString = "371330042.2441"
+         timestampString = "371331562.443595"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "824"
-         endingLineNumber = "824"
+         startingLineNumber = "911"
+         endingLineNumber = "911"
          landmarkName = "-alertView:didDismissWithButtonIndex:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -21,11 +21,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Bomberman/Projectfiles/GameScenes/GameLayer.m"
-         timestampString = "371330042.2441"
+         timestampString = "371331562.443595"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "566"
-         endingLineNumber = "566"
+         startingLineNumber = "653"
+         endingLineNumber = "653"
          landmarkName = "-moveGameObject:direction:isPlayer:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -34,11 +34,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Bomberman/Projectfiles/GameScenes/GameLayer.m"
-         timestampString = "371330042.2441"
+         timestampString = "371331562.443595"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "801"
-         endingLineNumber = "801"
+         startingLineNumber = "888"
+         endingLineNumber = "888"
          landmarkName = "-receiveData:fromPeer:inSession:context:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -47,11 +47,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Bomberman/Projectfiles/GameScenes/GameLayer.m"
-         timestampString = "371306884.116378"
+         timestampString = "371331231.113145"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "261"
-         endingLineNumber = "261"
+         startingLineNumber = "289"
+         endingLineNumber = "289"
          landmarkName = "-update:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -60,11 +60,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Bomberman/Projectfiles/GameScenes/GameLayer.m"
-         timestampString = "371307040.376756"
+         timestampString = "371331231.113145"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "289"
-         endingLineNumber = "289"
+         startingLineNumber = "317"
+         endingLineNumber = "317"
          landmarkName = "-update:"
          landmarkType = "5">
       </FileBreakpoint>

@@ -25,6 +25,9 @@ static UIEdgeInsets GameObjectEdgeInsets = { 3, 3, 3, 3 };
 static const CGFloat ProjectileVelocity = 2.0f;
 
 
+typedef enum { kNotGameOver, kServerWin, kClientWin } GameOverState;
+
+
 #pragma mark - PlayerAction
 
 @interface PlayerAction : NSObject<NSCoding>
@@ -80,6 +83,8 @@ static const CGFloat ProjectileVelocity = 2.0f;
 @property (nonatomic, assign) CGPoint velocity;
 @property (nonatomic, assign) Direction direction;
 
+@property (nonatomic, assign) int hp;
+
 - (id)initWithIdentifier:(NSString *)identifier position:(CGPoint)position velocity:(CGPoint)velocity direction:(Direction)direction;
 
 @end
@@ -90,6 +95,8 @@ static const CGFloat ProjectileVelocity = 2.0f;
 @synthesize position = _position;
 @synthesize velocity = _velocity;
 @synthesize direction = _direction;
+
+@synthesize hp = _hp;
 
 
 - (id)initWithIdentifier:(NSString *)identifier position:(CGPoint)position velocity:(CGPoint)velocity direction:(Direction)direction;
@@ -112,6 +119,8 @@ static const CGFloat ProjectileVelocity = 2.0f;
         self.position = [decoder decodeCGPointForKey:@"position"];
         self.velocity = [decoder decodeCGPointForKey:@"velocity"];
         self.direction = (Direction)[decoder decodeIntForKey:@"direction"];
+        
+        self.hp = [decoder decodeIntForKey:@"hp"];
     }
     return self;
 }
@@ -122,6 +131,8 @@ static const CGFloat ProjectileVelocity = 2.0f;
     [encoder encodeCGPoint:self.position forKey:@"position"];
     [encoder encodeCGPoint:self.velocity forKey:@"velocity"];
     [encoder encodeInt:self.direction forKey:@"direction"];
+    
+    [encoder encodeInt:self.hp forKey:@"hp"];
 }
 
 @end
@@ -133,6 +144,8 @@ static const CGFloat ProjectileVelocity = 2.0f;
 @property (nonatomic, strong) GameObjectState *clientBombermanState;
 @property (nonatomic, strong) NSArray *clientProjectilesStates;
 
+@property (nonatomic, assign) GameOverState gameOverState;
+
 @end
 
 
@@ -143,6 +156,17 @@ static const CGFloat ProjectileVelocity = 2.0f;
 @synthesize clientBombermanState = _clientBombermanState;
 @synthesize clientProjectilesStates = _clientProjectilesStates;
 
+@synthesize gameOverState = _gameOverState;
+
+- (id)init
+{
+    if (self = [super init])
+    {
+        self.gameOverState = kNotGameOver;
+    }
+    return self;
+}
+
 - (id)initWithCoder:(NSCoder *)decoder
 {
     if (self = [super init])
@@ -151,6 +175,8 @@ static const CGFloat ProjectileVelocity = 2.0f;
         self.serverProjectilesStates = [decoder decodeObjectForKey:@"serverProjectilesStates"];
         self.clientBombermanState = [decoder decodeObjectForKey:@"clientBombermanState"];
         self.clientProjectilesStates = [decoder decodeObjectForKey:@"clientProjectilesStates"];
+        
+        self.gameOverState = (GameOverState) [decoder decodeIntForKey:@"gameOverState"];
     }
     return self;
 }
@@ -161,6 +187,8 @@ static const CGFloat ProjectileVelocity = 2.0f;
     [encoder encodeObject:self.serverProjectilesStates forKey:@"serverProjectilesStates"];
     [encoder encodeObject:self.clientBombermanState forKey:@"clientBombermanState"];
     [encoder encodeObject:self.clientProjectilesStates forKey:@"clientProjectilesStates"];
+    
+    [encoder encodeInt:self.gameOverState forKey:@"gameOverState"];
 }
 
 @end
@@ -357,6 +385,33 @@ static const CGFloat ProjectileVelocity = 2.0f;
             [toBeDestroyedEnemiesProjectiles removeLastObject];
         }
         
+        for (Projectile *allyProjectile in self.alliesProjectiles)
+            if (CGRectIntersectsRect(allyProjectile.boundingBox, self.enemyBomberman.boundingBox))
+            {
+                if (! [toBeDestroyedAlliesProjectiles containsObject:allyProjectile])
+                    [toBeDestroyedAlliesProjectiles addObject:allyProjectile];
+                self.enemyBomberman.hp--;
+            }
+        for (Projectile *enemyProjectile in self.enemiesProjectiles)
+            if (CGRectIntersectsRect(enemyProjectile.boundingBox, self.bomberman.boundingBox))
+            {
+                if (! [toBeDestroyedEnemiesProjectiles containsObject:enemyProjectile])
+                    [toBeDestroyedEnemiesProjectiles addObject:enemyProjectile];
+                self.bomberman.hp--;
+            }
+        [self.alliesProjectiles removeObjectsInArray:toBeDestroyedAlliesProjectiles];
+        while (toBeDestroyedAlliesProjectiles.count)
+        {
+            [self.projectileBatchNode removeChild:[toBeDestroyedAlliesProjectiles lastObject] cleanup:YES];
+            [toBeDestroyedAlliesProjectiles removeLastObject];
+        }
+        [self.enemiesProjectiles removeObjectsInArray:toBeDestroyedEnemiesProjectiles];
+        while (toBeDestroyedEnemiesProjectiles.count)
+        {
+            [self.projectileBatchNode removeChild:[toBeDestroyedEnemiesProjectiles lastObject] cleanup:YES];
+            [toBeDestroyedEnemiesProjectiles removeLastObject];
+        }
+        
         NSMutableArray *serverProjectilesStates = [NSMutableArray arrayWithCapacity:self.alliesProjectiles.count];
         for (Projectile *projectile in self.alliesProjectiles)
         {
@@ -373,8 +428,26 @@ static const CGFloat ProjectileVelocity = 2.0f;
         }
         gameState.clientProjectilesStates = [NSArray arrayWithArray:clientProjectilesStates];
         
+        gameState.serverBombermanState.hp = self.bomberman.hp;
+        gameState.clientBombermanState.hp = self.enemyBomberman.hp;
+        
+        if (self.bomberman.hp <= 0)
+            gameState.gameOverState = kClientWin;
+        else if (self.enemyBomberman.hp <= 0)
+            gameState.gameOverState = kServerWin;
+        
         // Send updates to clients
         [self broadcastDataToClients:[NSKeyedArchiver archivedDataWithRootObject:gameState]];
+        
+        if (gameState.gameOverState != kNotGameOver)
+        {
+            BOOL win = gameState.gameOverState == kServerWin;
+            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Game Over" message:(win ? @"Congratulation! You won" : @"Better luck next time") delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            
+            [self unscheduleUpdate];
+            [[CCDirector sharedDirector] pause];
+            [alertView show];
+        }
     }
     else
     {
@@ -390,6 +463,18 @@ static const CGFloat ProjectileVelocity = 2.0f;
         // Update according to server
         if (self.serverGameState)
         {
+            if (self.serverGameState.gameOverState != kNotGameOver)
+            {
+                BOOL win = self.serverGameState.gameOverState == kClientWin;
+                UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Game Over" message:(win ? @"Congratulation! You won" : @"Better luck next time") delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+                
+                [self unscheduleUpdate];
+                [[CCDirector sharedDirector] pause];
+                [alertView show];
+                
+                return;
+            }
+            
             joystickDirection = self.serverGameState.clientBombermanState.direction;
             if (joystickDirection != kNoDirection)
                 [self.bomberman playMovingAnimWithDirection:joystickDirection];
@@ -397,6 +482,7 @@ static const CGFloat ProjectileVelocity = 2.0f;
                 [self.bomberman stopMovingAnim];
             [self moveGameObject:self.bomberman direction:joystickDirection isPlayer:YES];
             self.bomberman.position = self.serverGameState.clientBombermanState.position;
+            self.bomberman.hp = self.serverGameState.clientBombermanState.hp;
             
             joystickDirection = self.serverGameState.serverBombermanState.direction;
             if (joystickDirection != kNoDirection)
@@ -405,6 +491,7 @@ static const CGFloat ProjectileVelocity = 2.0f;
                 [self.enemyBomberman stopMovingAnim];
             [self moveGameObject:self.enemyBomberman direction:joystickDirection isPlayer:YES];
             self.enemyBomberman.position = self.serverGameState.serverBombermanState.position;
+            self.enemyBomberman.hp = self.serverGameState.serverBombermanState.hp;
             
             NSArray *alliesProjectilesStates = self.serverGameState.clientProjectilesStates;
             NSMutableDictionary *oldAlliesProjectiles = [NSMutableDictionary dictionaryWithCapacity:self.alliesProjectiles.count];
@@ -793,7 +880,7 @@ static const CGFloat ProjectileVelocity = 2.0f;
 - (void)broadcastDataToClients:(NSData *)data
 {
     if (self.gkSession && self.gkSession.sessionMode == GKSessionModeServer)
-        [self.gkSession sendDataToAllPeers:data withDataMode:GKSendDataReliable error:nil];
+        [self.gkSession sendDataToAllPeers:data withDataMode:GKSendDataUnreliable error:nil];
 }
 
 - (void)receiveData:(NSData *)data fromPeer:(NSString *)peer inSession:(GKSession *)session context:(void *)context
